@@ -98,7 +98,7 @@ function love.update(dt)
 
     -- Update game state here (e.g., handle input, update characters, etc.)
     local rearForce = 175
-    local frontTorque = 75
+    local frontTorque = 100
     -- loop through directions
     for i, dir in ipairs(Directions) do
         local dirdt = dt * rearForce
