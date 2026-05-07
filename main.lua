@@ -98,7 +98,7 @@ function love.update(dt)
 
     -- Update game state here (e.g., handle input, update characters, etc.)
     local rearForce = 175
-    local frontTorque = 100
+    local frontTorque = 200
     -- loop through directions
     for i, dir in ipairs(Directions) do
         local dirdt = dt * rearForce
@@ -119,14 +119,12 @@ function love.update(dt)
             if joystick:getGamepadAxis("lefty") ~= 0 then
                 rear.body:applyLinearImpulse(0, dirdt * joystick:getGamepadAxis("lefty"))
             end
-            local dx = front.body.getX(rear.body)  
-            local dy = front.body.getY(rear.body)  
-            
+             
             if joystick:getGamepadAxis("rightx") ~= 0 then
                 if dy == 0 then 
                     front.body = front.body
                 else
-                    front.body:applyLinearImpulse(0, frontTorque * dt * (dx / dy) * joystick:getGamepadAxis("righty"))
+                    front.body:applyLinearImpulse(0, frontTorque * dt *  joystick:getGamepadAxis("righty"))
                 end
             end
             -- rear.body:applyLinearImpulse(joystick:getGamepadAxis("lefty"))
