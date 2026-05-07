@@ -3,7 +3,10 @@
 
 ## Made with Love2D
 
-### Dedicated to the LOML
+###### Dedicated to the LOML
+
+## Build
+a `build.sh` script is provided for building release binaries for Windows & Linux. Build script output can be found in the `release` folder.
 
 ## Basic Controls
 
@@ -12,8 +15,11 @@ free to attempt mastering these basic controls while the
 remaining mechanics and mappings are completed. Have fun and good luck!
 
 ```mermaid
-
-graph LR
+---
+config:
+    theme: 'neutral'
+---
+flowchart LR
 
     R((RearWheel))
     F((Front Wheel))
@@ -28,12 +34,10 @@ graph LR
         AxisY2[AxisY]
     end
 
-    Force <--- LS
+    LS ---> Force
     Force --> R
 
     AxisY2[AxisY] --- RS --> Torque --> F
-
-    
 ```
 
 ## Goals
@@ -48,3 +52,37 @@ Noting that this is a minimal set of bits of knowledge, take note of the followi
 1. You'll not be able to get airborne using input from a single stick. Well, perhaps you can, but not easily, from a standstill.  
 2. Applying Forces to one wheel will affect your ability to apply forces through the other wheel. Of course, you can and are meant to use both inputs to maneuver, but to have full control, you'll want to study and experiment some.
 3. Full control is not meant to really be achievable. At least at some points, your movement through the arena can only be described as "Que sera, sera" until you hit a wall, or the floor, or get lucky in getting reorientated. 
+
+## TODOs
+
+### Basic Controls
+
+| Kanban Code | Description | Priority |
+|------|-------------|----------|
+| TB00 | Torque Break: An input which brings angular velocity to a stop | `Highest` | 
+| TI00 | Torque Increaser: An input which increases the torque applied on the front wheel | `Medium` | 
+| TL00 | Torque Limiter: Internal default torque limit when no Increaser input is given | `High` |
+
+### Kanban
+```mermaid
+---
+config:
+  theme: 'forest'
+---
+kanban
+  physics[PhysicsTodo]
+    tg[Torque Break]@{ticket: TB00,  priority: 'Very High'}
+    tg[Torque Increaser]@{ticket: TI00,  priority: 'High'}
+    tg[Torque Limitewr]@{ticket: TL00,  priority: 'High'}
+  q[In progress]
+    id6[Explain Concepts in README]
+  id9[VideoDoc - In Progress]
+    id8[Record Basic Mechanics] 
+  id10[Ready for test]
+    id4[Challenge Others to Perform Mechanics]@{ ticket: 2038, assigned: 'entitycs', priority: 'High' }
+    id66[last item]@{ priority: 'Very Low', assigned: 'knsv' }
+  id11[Done]
+    id5[Define base character abilities]
+    id2[POC World + Demo] 
+ 
+```

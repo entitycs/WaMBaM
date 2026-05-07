@@ -144,7 +144,7 @@ function love.draw()
     love.graphics.line(floor.shape:getPoints())
 
     -- Draw rear wheel
-    love.graphics.setColor(0.2, 0.7, 1.0)
+    love.graphics.setColor(1, 0.4, 0.4)
     love.graphics.circle("fill",
         rear.body:getX(),
         rear.body:getY(),
@@ -152,8 +152,7 @@ function love.draw()
     )
 
     -- Draw Front Wheel
- 
-    love.graphics.setColor(1, 0.4, 0.4)
+    love.graphics.setColor(0.4, 1, 0.4)
     love.graphics.circle("fill",
         front.body:getX(),
         front.body:getY(),
@@ -161,7 +160,7 @@ function love.draw()
     )
 
     -- Draw the line between them
-    love.graphics.setColor(1, 1, 1)
+    love.graphics.setColor(1, 1, 0.4)
     love.graphics.setLineWidth(3)
     love.graphics.line(
         rear.body:getX(), rear.body:getY(),
@@ -169,6 +168,7 @@ function love.draw()
     )
 
     -- Draw ball
+        love.graphics.setColor(1, 1, 1)
         love.graphics.circle("fill",
         ball.body:getX(),
         ball.body:getY(),
