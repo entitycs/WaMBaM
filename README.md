@@ -1,23 +1,23 @@
 # WaMBaM
-#### (ty ma'am)
+
+(ty ma'am)
 
 ## Made with Love2D
 
-###### Dedicated to the LOML
-
 ## Build
+
 a `build.sh` script is provided for building release binaries for Windows & Linux. Build script output can be found in the `release` folder.
 
 ## Basic Controls
 
-The *left stick* controls the rear wheel in all directions, through `force`. The *right stick* controls the `torque` applied through the front wheel. More is planned, but feel 
+The *left stick* controls the rear wheel in all directions, through `force`. The *right stick* controls the `torque` applied through the front wheel. More is planned, but feel
 free to attempt mastering these basic controls while the
 remaining mechanics and mappings are completed. Have fun and good luck!
 
 ```mermaid
 ---
 config:
-    theme: 'neutral'
+    theme: Neutral
 ---
 flowchart LR
 
@@ -42,7 +42,7 @@ flowchart LR
 
 ## Goals
 
-Also still in production are the `goals`. The goal of the game is to win by scoring more goals than the opponent. The `goals` are to be offset from the floor. Everyone 
+Also still in production are the `goals`. The goal of the game is to win by scoring more goals than the opponent. The `goals` are to be offset from the floor. Everyone
 will need to either get lucky enough to score, or learn enough mechanics to get the `ball` off of the floor and into their opponent's goal.  Your approach to get the ball off of the floor and intothe goal will be up to you. How your opponents approach the same task will likely differ. Perhaps you can learn from one another.
 
 ## Basic Mechanics
@@ -51,19 +51,28 @@ Noting that this is a minimal set of bits of knowledge, take note of the followi
 
 1. You'll not be able to get airborne using input from a single stick. Well, perhaps you can, but not easily, from a standstill.  
 2. Applying Forces to one wheel will affect your ability to apply forces through the other wheel. Of course, you can and are meant to use both inputs to maneuver, but to have full control, you'll want to study and experiment some.
-3. Full control is not meant to really be achievable. At least at some points, your movement through the arena can only be described as "Que sera, sera" until you hit a wall, or the floor, or get lucky in getting reorientated. 
+3. Full control is not meant to really be achievable. At least at some points, your movement through the arena can only be described as "Que sera, sera" until you hit a wall, or the floor, or get lucky in getting reorientated.
 
 ## TODOs
 
 ### Basic Controls
 
 | Kanban Code | Description | Priority |
-|------|-------------|----------|
-| TB00 | Torque Break: An input which brings angular velocity to a stop | `Highest` | 
-| TI00 | Torque Increaser: An input which increases the torque applied on the front wheel | `Medium` | 
+| ------ | ------------- |---------- |
+| FTB00 | Force/Torque Brake: An input which brings  velocity to a stop over time | `Highest` |
+| TI00 | Torque Increaser: An input which increases the torque applied on the front wheel | `Medium` |
 | TL00 | Torque Limiter: Internal default torque limit when no Increaser input is given | `High` |
+| FTB00 | Torque/Force Breaking (per handle) | `High` |
+
+### Interaction Signifiers
+
+| Kanban Code | Description | Priority |
+| ------ | ------------- | ---------- |
+| ISB00 | Backdrop: Planned `'arena'` backdrops are local street art (credited placeholders until then) | `Highest` |
+| ISI00 | WaMBaM Interactions: Graffiti-like WaM / BaM for respective colliders (rear/front) | `Medium` |
 
 ### Kanban
+
 ```mermaid
 ---
 config:
@@ -86,3 +95,9 @@ kanban
     id2[POC World + Demo] 
  
 ```
+
+#### Credits
+
+##### Further Acknowledgements
+
+###### Dedicated to the LOML

@@ -1,18 +1,23 @@
+require("core.ratios")
+require("current.arena")
+Arena = require("core.arena")
+JoystickInput = require("core.joystick")
+
+local logger = {}
+
 local window = {}
 
 local world
-local floor = {}    -- floor/ground
+
+-- local floor = {}    -- floor/ground
 local rear = {}     -- main wheel
 local front = {}    -- second wheel
 local center = {}   -- connector
 
 local ball = {}     -- game ball
 
-local joystick = nil
-
 function love.load()
-    local joysticks = love.joystick.getJoysticks()
-    joystick = nil
+    JoystickInput:load()
     window.left = 0
     window.top = 0
     window.right = 1200
@@ -28,33 +33,36 @@ function love.load()
     rear.y = 0
 
     ball.body = love.physics.newBody(world, 400, 400, "dynamic")
-    ball.shape = love.physics.newCircleShape(wheelSize * 2)
+    ball.shape = love.physics.newCircleShape(BallSize(wheelSize))
     ball.fixture = love.physics.newFixture(ball.body, ball.shape, 1)
     ball.fixture:setRestitution(0.5)
     ball.fixture:setFriction(0.1)
-    ball.body:setMass(0.1)
+    ball.body:setMass(0.5)
 
-    -- Floor in category 1
-    floor.body = love.physics.newBody(world, 0, 0, "static")
-    floor.shape = love.physics.newEdgeShape(0, window.bottom - 100, window.right, window.bottom - 100)
-    floor.fixture = love.physics.newFixture(floor.body, floor.shape)
-    floor.fixture:setFriction(0.8)
+    -- Arena
+    Arena:load(window, world)
 
-    -- Player in category 2
+    -- Per 'Round/Game' Arena
+    CurrentArena:load(window, world)
+
+    -- Player
+    -- Rear 'Wheel'
     rear.body = love.physics.newBody(world, rear.x, rear.y, "dynamic")
     rear.shape = love.physics.newCircleShape(wheelSize) -- copilot fix (wrong arguments prev.)
     rear.fixture = love.physics.newFixture(rear.body, rear.shape, 1)
-    rear.fixture:setRestitution(0.3)
+    rear.fixture:setRestitution(0.1)
     rear.fixture:setFriction(0.9)
     rear.body:setMass(2)
     rear.body:setGravityScale(3)
-    -- A Wheel Fixed to a joint
+    -- Front 'Wheel'
     front.body = love.physics.newBody(world, rear.x + wheelSize * 6, rear.y, "dynamic")
     front.shape = love.physics.newCircleShape(wheelSize)
     front.fixture = love.physics.newFixture(front.body, front.shape, 1)
-    front.fixture:setRestitution(0.3)
+    front.fixture:setRestitution(0.85)
     front.fixture:setFriction(0.4)
-    front.body:setMass(0.7)
+    front.body:setMass(FrontWheelMass(rear.body:getMass()))
+    front.body:setGravityScale(FrontWheelGravityScale(rear.body:getGravityScale()))
+    -- 'Center/Body' (no collision)
     center.joint = love.physics.newDistanceJoint(
         rear.body, front.body,
         rear.body:getX(), front.body:getY(),
@@ -63,45 +71,24 @@ function love.load()
     )
 
     Directions = { "up", "down", "left", "right" }
-
     DirectionTargets = { "y", "y", "x", "x" }
-    -- World boundaries (static edges)
-    walls = {}
-
-    -- Left wall
-    walls.left = {}
-    walls.left.body = love.physics.newBody(world, 0, 0, "static")
-    walls.left.shape = love.physics.newEdgeShape(0, 0, 0, window.bottom)
-    walls.left.fixture = love.physics.newFixture(walls.left.body, walls.left.shape)
-
-    -- Right wall
-    walls.right = {}
-    walls.right.body = love.physics.newBody(world, 0, 0, "static")
-    walls.right.shape = love.physics.newEdgeShape(window.right, 0, window.right, window.bottom)
-    walls.right.fixture = love.physics.newFixture(walls.right.body, walls.right.shape)
-
-    -- Ceiling
-    walls.top = {}
-    walls.top.body = love.physics.newBody(world, 0, 0, "static")
-    walls.top.shape = love.physics.newEdgeShape(0, 0, window.right, 0)
-    walls.top.fixture = love.physics.newFixture(walls.top.body, walls.top.shape)
-
-
-    
 end
-function love.joystickadded(js)
-    joystick = js
-end
+
 
 function love.update(dt)
     world:update(dt)
-
+    local dimmer = 1.0
     -- Update game state here (e.g., handle input, update characters, etc.)
-    local rearForce = 175
-    local frontTorque = 200
+    rear.force = 300 * dimmer
+    front.torque = FrontWheelTorque(rear.force) --175 * dimmer
+
+    -- joystick input (up to date)
+    JoystickInput:update(dt, rear, front)
+
+    -- keyboard input (lagging behind)
     -- loop through directions
-    for i, dir in ipairs(Directions) do
-        local dirdt = dt * rearForce
+    for i, dir in ipairs(Directions) do -- todo, sep. loop for joystick
+        local dirdt = dt * rear.force
         if love.keyboard.isDown(dir) then
             if i % 2 == 1 then
                 dirdt = -dirdt -- Reverse direction if odd
@@ -111,37 +98,21 @@ function love.update(dt)
             else
                 rear.body:applyLinearImpulse(0, dirdt)
             end
-        elseif joystick  ~= nil then
-            if joystick:getGamepadAxis("leftx") ~= 0 then
-                rear.body:applyLinearImpulse(dirdt * joystick:getGamepadAxis("leftx"), 0)
-                -- rear.body:applyAngularImpulse(dirdt * joystick:getGamepadAxis("leftx"))
-            end
-            if joystick:getGamepadAxis("lefty") ~= 0 then
-                rear.body:applyLinearImpulse(0, dirdt * joystick:getGamepadAxis("lefty"))
-            end
-             
-            if joystick:getGamepadAxis("rightx") ~= 0 then
-                if dy == 0 then 
-                    front.body = front.body
-                else
-                    front.body:applyLinearImpulse(0, frontTorque * dt *  joystick:getGamepadAxis("righty"))
-                end
-            end
-            -- rear.body:applyLinearImpulse(joystick:getGamepadAxis("lefty"))
         end
     end
 end
 
 
 function love.draw()
-    -- Draw everything on the screen
+    -- Wipe the screen
     love.graphics.clear(0.1, 0.1, 0.12)
+    love.graphics.setColor(.5, .5, .5)
 
-    love.graphics.print(floor.shape:getPoints(), 50, 100) -- Print text on the screen
-    -- Draw floor edge
-    love.graphics.setColor(0.8, 0.8, 0.8)
-    love.graphics.setLineWidth(4)
-    love.graphics.line(floor.shape:getPoints())
+    -- Draw Arena (Backdrop => first)
+    CurrentArena:draw()
+    
+    -- Draw Arena 
+    Arena:draw()
 
     -- Draw rear wheel
     love.graphics.setColor(1, 0.4, 0.4)
@@ -174,22 +145,7 @@ function love.draw()
         ball.body:getY(),
         ball.shape:getRadius()
     )
-    -- Joystick:
-    local joysticks = love.joystick.getJoysticks()
-    for i, joystick in ipairs(joysticks) do
-        love.graphics.print(joystick:getName(), 10, i * 20)
-        for j = 1, 2 do
-            love.graphics.setColor(0, 1, 0) -- Green for axes
-            love.graphics.print(j, 20, (i + j) * 20)
-        end
-    end
-    
-    if joystick  ~= nil then
-        if joystick:getGamepadAxis("leftx") ~= 0 then
-            love.graphics.print(joystick:getGamepadAxis("leftx"), 300, 300)
-        end
-        if joystick:getGamepadAxis("lefty") ~= 0 then
-            love.graphics.print(joystick:getGamepadAxis("lefty"), 400, 400)
-        end
-    end
+
+    -- Joystick debug
+    JoystickInput:draw()
 end
