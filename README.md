@@ -89,7 +89,6 @@ kanban
     id8[Record Basic Mechanics] 
   id10[Ready for test]
     id4[Challenge Others to Perform Mechanics]@{ ticket: 2038, assigned: 'entitycs', priority: 'High' }
-    id66[last item]@{ priority: 'Very Low', assigned: 'knsv' }
   id11[Done]
     id5[Define base character abilities]
     id2[POC World + Demo] 
