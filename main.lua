@@ -51,7 +51,7 @@ function love.load()
     rear.shape = love.physics.newCircleShape(wheelSize) -- copilot fix (wrong arguments prev.)
     rear.fixture = love.physics.newFixture(rear.body, rear.shape, 1)
     rear.fixture:setRestitution(0.1)
-    rear.fixture:setFriction(0.9)
+    rear.fixture:setFriction(1)
     rear.body:setMass(2)
     rear.body:setGravityScale(3)
     -- Front 'Wheel'
@@ -59,7 +59,7 @@ function love.load()
     front.shape = love.physics.newCircleShape(wheelSize)
     front.fixture = love.physics.newFixture(front.body, front.shape, 1)
     front.fixture:setRestitution(0.85)
-    front.fixture:setFriction(0.4)
+    front.fixture:setFriction(0.0)
     front.body:setMass(FrontWheelMass(rear.body:getMass()))
     front.body:setGravityScale(FrontWheelGravityScale(rear.body:getGravityScale()))
     -- 'Center/Body' (no collision)
@@ -79,7 +79,7 @@ function love.update(dt)
     world:update(dt)
     local dimmer = 1.0
     -- Update game state here (e.g., handle input, update characters, etc.)
-    rear.force = 300 * dimmer
+    rear.force = 350 * dimmer
     front.torque = FrontWheelTorque(rear.force) --175 * dimmer
 
     -- joystick input (up to date)

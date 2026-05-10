@@ -58,15 +58,16 @@ function JoystickInput:update(dt, rear, front)
                 front.body:applyLinearImpulse(0, currentAngle.impulse)
                 currentAngle.x, currentAngle.y = rear.body:getLinearVelocity()
             end
-        elseif joystick:getGamepadAxis("rightx") ~= 0 then
-            if rear.body:getX() == front.body:getX() then
-                front.body = front.body
-            else
-                currentAngle.impulse = front.torque * dt * joystick:getGamepadAxis("rightx")
-                front.body:applyLinearImpulse(currentAngle.impulse, 0)
-                -- currentAngle.x, currentAngle.y = rear.body:getLinearVelocity()
-            end
         end
+        -- if joystick:getGamepadAxis("rightx") ~= 0 then
+        --     if rear.body:getX() == front.body:getX() then
+        --         front.body = front.body
+        --     else
+        --         currentAngle.impulse = front.torque * dt * joystick:getGamepadAxis("rightx")
+        --         front.body:applyLinearImpulse(currentAngle.impulse, 0)
+        --         -- currentAngle.x, currentAngle.y = rear.body:getLinearVelocity()
+        --     end
+        -- end
     end
 end
 
