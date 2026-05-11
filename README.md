@@ -79,8 +79,8 @@ Noting that this is a minimal set of bits of knowledge, take note of the followi
 | Img | Name | Description |
 | --- | ---- | --------- |
 | ![Carry example gif](images/carry.gif) | Carry | Place the ball above the WaM'er and lift it off of the ground, balancing as the ball keeps steady contact with the WaM'er (rear 'wheel') |
-| ![Carry example gif](images/carry.gif)  | WaM | Hit the ball with sufficient force using the rear 'wheel' |
-| ![WaM example gif](images/WaM.gif)  | BaM | Hit the ball with sufficient force using the front 'wheel' |
+| ![WaM example gif](images/WaM.gif)  | WaM | Hit the ball with sufficient force using the rear 'wheel' |
+| ![BaM example gif](images/BaM.gif)  | BaM | Hit the ball with sufficient force using the front 'wheel' |
 | ![Carry WaMBaM example gif](images/WaMBaM.gif)  | WaMBaM | Transition from Carrying or from a WaM into a BaM |
 
 ## TODOs
