@@ -1,14 +1,16 @@
 local Rear = {}
 
 function Rear:drop(x_pos, y_pos)
-
+    self.x = math.abs(x_pos)
+    self.y = math.abs(y_pos)
 end
 
 function Rear:load(window, world, size)
     self.x = 100
     self.y = 0
+    self.size = size
     self.body = love.physics.newBody(world, self.x, self.y, "dynamic")
-    self.shape = love.physics.newCircleShape(size) -- copilot fix (wrong arguments prev.)
+    self.shape = love.physics.newCircleShape(self.size) -- copilot fix (wrong arguments prev.)
     self.fixture = love.physics.newFixture(self.body, self.shape, 1)
     self.fixture:setRestitution(0.1)
     self.fixture:setFriction(1)

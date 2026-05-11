@@ -5,6 +5,7 @@ JoystickInput = require("core.joystick")
 Moonshine = require("lib.moonshine")
 Shockwave = require("agent.copilot.shockwave")
 local Rear = require("player.rear")
+local Front = require("player.front")
 
 local logger = {}
 
@@ -13,8 +14,8 @@ local signifiers = {
     normals = {}
 }
 function signifiers.collisionOnEnter(fixture_a, fixture_b, contact)
-    ud_a = fixture_a:getUserData()
-    ud_b = fixture_b:getUserData()
+    local ud_a = fixture_a:getUserData()
+    local ud_b = fixture_b:getUserData()
     print(ud_b)
     if (ud_a ~= nil and ud_b ~= nil) and ((ud_a["name"] == "Front") or (ud_b["name"] == "Front")) then
         if (ud_a["name"] == "Ball") or (ud_b["name"] == "Ball") then
@@ -40,14 +41,14 @@ local world
 
 -- local floor = {}    -- floor/ground
 -- local rear = {}     -- main wheel
-local front = {}    -- second wheel
+-- local front = {}    -- second wheel
 local center = {}   -- connector
 
 local ball = {}     -- game ball
 
 function love.load()
     love.physics.setMeter(64)
-    effect = Moonshine(Moonshine.effects.glow)
+    -- effect = Moonshine(Moonshine.effects.glow)
     JoystickInput:load()
     window.left = 0
     window.top = 0
@@ -81,30 +82,20 @@ function love.load()
     -- Player
     -- Rear 'Wheel'
     Rear:load(window, world, wheelSize)
-
     -- Front 'Wheel'
-    front.body = love.physics.newBody(world, Rear.x + wheelSize * 6, Rear.y, "dynamic")
-    front.shape = love.physics.newCircleShape(wheelSize)
-    front.fixture = love.physics.newFixture(front.body, front.shape, 1)
-    front.fixture:setRestitution(0.85)
-    front.fixture:setFriction(0.0)
-    front.fixture:setUserData({name = "Front"})
-    front.body:setLinearDamping(1)
-    front.body:setMass(FrontWheelMass(Rear.body:getMass()))
-    front.body:setGravityScale(FrontWheelGravityScale(Rear.body:getGravityScale()))
+    Front:load(window, world, Rear)
+
     -- 'Center/Body' (no collision)
     center.joint = love.physics.newDistanceJoint(
-        Rear.body, front.body,
-        Rear.body:getX(), front.body:getY(),
-        front.body:getX(), front.body:getY(),
+        Rear.body, Front.body,
+        Rear.body:getX(), Front.body:getY(),
+        Front.body:getX(), Front.body:getY(),
         false -- do not collide with each other
     )
         
     Directions = { "up", "down", "left", "right" }
     DirectionTargets = { "y", "y", "x", "x" }
-    -- local dimmer = 1.0
-    -- Rear.force = 500 * dimmer
-    front.torque = FrontWheelTorque(Rear.force) --175 * dimmer
+
 end
 
 
@@ -123,8 +114,9 @@ function love.update(dt)
     -- Update game state here (e.g., handle input, update characters, etc.)
 
     -- joystick input (up to date)
-    JoystickInput:update(dt, Rear, front)
+    JoystickInput:update(dt, Rear, Front)
     Rear:update(dt)
+    Front:update(dt)
     -- keyboard input (lagging behind)
     -- loop through directions
     local limitedX = false
@@ -151,9 +143,6 @@ function love.update(dt)
             end
         end
     end
-    local curVel_x, curVel_y = Rear.body:getLinearVelocity()
-    
-    
 end
 
 
@@ -179,19 +168,14 @@ function love.draw()
     -- )
     -- end)
     -- Draw Front Wheel
-    love.graphics.setColor(0.4, 1, 0.4)
-    love.graphics.circle("fill",
-    front.body:getX(),
-    front.body:getY(),
-        front.shape:getRadius()
-    )
-    
+    Front:draw()
+
     -- Draw the line between them
     love.graphics.setColor(1, 1, 0.4)
     love.graphics.setLineWidth(3)
     love.graphics.line(
         Rear.body:getX(), Rear.body:getY(),
-        front.body:getX(), front.body:getY()
+        Front.body:getX(), Front.body:getY()
     )
     
     -- Draw ball

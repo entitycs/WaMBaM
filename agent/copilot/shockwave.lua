@@ -3,17 +3,28 @@ Shockwave.__index = Shockwave
 
 -- Pre-create the texture ONCE, outside physics callbacks
 local shockwaveTexture
-
+local shockwaveImage = love.graphics.newImage("agent/copilot/images/shockwave.png")
+shockwaveImage:setFilter("linear", "linear")
 function Shockwave:load()
+    local source = love.graphics.newImage("images/WaMgraf1.jpg")
     shockwaveTexture = love.graphics.newCanvas(32, 32)
-    love.graphics.setCanvas(shockwaveTexture)
     love.graphics.clear(0, 0, 0, 0)
-    love.graphics.setColor(1, 1, 1, 1)
-    love.graphics.circle("fill", 16, 16, 16)
+    -- draw a circle mask
+    love.graphics.stencil(function()
+        love.graphics.circle("fill", 32, 32, 32)
+    end, "replace", 1)
+    love.graphics.setStencilTest("equal", 1)
+    love.graphics.setCanvas(shockwaveTexture)
+
+    -- draw your image inside the mask
+    love.graphics.draw(source, 0, 0, 0, 64/source:getWidth(), 64/source:getHeight())
+    -- love.graphics.setColor(1, 1, 1, 1)
+    -- love.graphics.circle("fill", 16, 16, 16)
+    love.graphics.setStencilTest()
     love.graphics.setCanvas()
 end
 function Shockwave.new(x, y)
-    local ps = love.graphics.newParticleSystem(shockwaveTexture, 1)
+    local ps = love.graphics.newParticleSystem(shockwaveImage, 1) --shockwaveTexture, 1)
     -- Create particle system using the prebuilt texture
 
     ps:setBufferSize(1)
@@ -52,11 +63,12 @@ function Shockwave:update(dt)
 end
 
 function Shockwave:draw()
-    love.graphics.setBlendMode("alpha")
-    -- love.graphics.setBlendMode("add")
+    love.graphics.setColor(1, 1, 1, 1)
+    love.graphics.setBlendMode("add")
     love.graphics.draw(self.ps)
+    love.graphics.setBlendMode("alpha")
  
-
+-- love.graphics.draw(shockwaveImage, 100, 100)
 end
 
 return Shockwave
