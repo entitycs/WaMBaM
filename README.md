@@ -93,22 +93,28 @@ config:
   theme: 'forest'
 ---
 kanban
+  core[Core Todo]
+    ct[Goal Design / Placement]
+    ct[Points System / Scoring]
+    ct[Level Customization / Progression]
+  graphics[Graphics Todo]
+    sc[Collision Signifiers ~basic~]
+    sc[Collision Signifiers ~image/advanced~]
   physics[PhysicsTodo]
   q[In progress]
     tg[Torque Increaser]@{ticket: TI00,  priority: 'High'}
     tg[Torque Limiter]@{ticket: TL00,  priority: 'High'}
     id6[Explain Concepts in README]
   id9[VideoDoc - In Progress]
-    id8[Record Basic Mechanics] 
   id10[Ready for test]
     vl[Velocity Limiter]@{ticket: VL00, priority: 'High'}
 
     tg[Torque Break]@{ticket: TB00,  priority: 'Very High'}
     id4[Challenge Others to Perform Mechanics]@{ ticket: 2038, assigned: 'entitycs', priority: 'High' }
   id11[Done]
+    id8[Record Basic Mechanics] 
     id5[Define base character abilities]
-    id2[POC World + Demo] 
- 
+    id2[POC World + Demo]
 ```
 
 ### Controls (basic)
