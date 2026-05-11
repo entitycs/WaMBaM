@@ -72,14 +72,16 @@ Noting that this is a minimal set of bits of knowledge, take note of the followi
 2. Applying Forces to one wheel will affect your ability to apply forces through the other wheel. Of course, you can and are meant to use both inputs to maneuver, but to have full control, you'll want to study and experiment some.
 3. Full control is not meant to really be achievable. At least at some points, your movement through the arena can only be described as "Que sera, sera" until you hit a wall, or the floor, or get lucky in getting reorientated.
 
-### Current Named Mechanics List (subject to change)
+### Current Named Mechanics List 
+
+(subject to change)
 
 | Img | Name | Description |
 | --- | ---- | --------- |
-| TODO | Carry | Place the ball above the WaM'er and lift it off of the ground, balancing as the ball keeps steady contact with the WaM'er (rear 'wheel') |
-| TODO | WaM | Hit the ball with sufficient force using the rear 'wheel' |
-| TODO | BaM | Hit the ball with sufficient force using the front 'wheel' |
-| TODO | WaMBaM | Transition from Carrying or from a WaM into a BaM |
+| ![Carry example gif](images/carry.gif) | Carry | Place the ball above the WaM'er and lift it off of the ground, balancing as the ball keeps steady contact with the WaM'er (rear 'wheel') |
+| ![Carry example gif](images/carry.gif)  | WaM | Hit the ball with sufficient force using the rear 'wheel' |
+| ![WaM example gif](images/WaM.gif)  | BaM | Hit the ball with sufficient force using the front 'wheel' |
+| ![Carry WaMBaM example gif](images/WaMBaM.gif)  | WaMBaM | Transition from Carrying or from a WaM into a BaM |
 
 ## TODOs
 
@@ -118,10 +120,13 @@ kanban
 
 ### Interaction Signifiers
 
+todo: some/any kind of pixel filter applied based on visuals/interactions
+
 | Kanban Code | Description | Priority |
 | ------ | ------------- | ---------- |
 | ISB00 | Backdrop: Planned `'arena'` backdrops are local street art (credited placeholders until then) | `Highest` |
 | ISI00 | WaMBaM Interactions: Graffiti-like WaM / BaM for respective colliders (rear/front) | `Medium` |
+| ISS00 | Signifier for when player breaks the 'proposed speed / torque limits' | `Low` |
 
 ## Files
 
@@ -134,8 +139,8 @@ config:
     themeVariables:
         treeView:
             labelFontSize: '20px'
-            labelColor: '#FF0000'
-            lineColor: '#00FF00'
+            labelColor: '#e05a5a'
+            lineColor: '#2c8b2c'
 ---
 treeView-beta
     "backdrops/"
@@ -146,10 +151,37 @@ treeView-beta
     "current/"
       "arena.lua"
     "release/"
+    "build.sh"
     "main.lua"
     "README.md"
 ```
 
+### README.md
+
+- `you are`***`here`***
+
+### main.lua
+
+- Main script
+
+### build.sh
+
+- Build from linux / wsl
+  - Produces .exe and .love executables. 
+  - Attempts to copy windows dlls from `c:/Program Files/LOVE/`
+
+### release/
+
+- Build script target location
+  
+### current/
+
+- Holds logic concerned with the current game / round **(volatile)**.
+
+#### current/arena.lua
+
+- Loads the arena background / other temporary arena settings
+  
 ### core/
 
 - Holds files handling core, static settings / setup.
@@ -265,6 +297,7 @@ classDiagram
     ...()
   }
 ```
+
 
 ## Credits
 
