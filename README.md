@@ -94,14 +94,16 @@ config:
 ---
 kanban
   physics[PhysicsTodo]
-    tg[Torque Break]@{ticket: TB00,  priority: 'Very High'}
-    tg[Torque Increaser]@{ticket: TI00,  priority: 'High'}
-    tg[Torque Limitewr]@{ticket: TL00,  priority: 'High'}
   q[In progress]
+    tg[Torque Increaser]@{ticket: TI00,  priority: 'High'}
+    tg[Torque Limiter]@{ticket: TL00,  priority: 'High'}
     id6[Explain Concepts in README]
   id9[VideoDoc - In Progress]
     id8[Record Basic Mechanics] 
   id10[Ready for test]
+    vl[Velocity Limiter]@{ticket: VL00, priority: 'High'}
+
+    tg[Torque Break]@{ticket: TB00,  priority: 'Very High'}
     id4[Challenge Others to Perform Mechanics]@{ ticket: 2038, assigned: 'entitycs', priority: 'High' }
   id11[Done]
     id5[Define base character abilities]
