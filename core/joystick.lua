@@ -2,9 +2,13 @@ local JoystickInput = {}
 local joystick = nil
 local lastButton = "none"
 local currentAngle = {}
+
+
 function love.joystickadded(js)
     joystick = js
 end
+
+
 function love.gamepadpressed(joystick, button)
     lastButton = button
 end
@@ -39,7 +43,7 @@ function JoystickInput:update(dt, rear, front)
             local newx2, newy2 = front.body:getLinearVelocity()
             rear.body:setLinearVelocity((newx + newx2) / 2, (newy + newy2) / 2)
             front.body:setLinearVelocity((newx + newx2) / 2, (newy + newy2) / 2)
-            front.body:setLinearDamping(0.25)
+            front.body:setLinearDamping(0.75)
             rear.body:setLinearDamping(0.1)
             currentAngle.changed = false
         end
@@ -78,6 +82,7 @@ function JoystickInput:update(dt, rear, front)
             else
                 currentAngle.impulse = front.torque * dt * joystick:getGamepadAxis("righty")
                 front.body:applyLinearImpulse(0, currentAngle.impulse)
+                rear.body:applyLinearImpulse(0, - .65 * currentAngle.impulse)
                 currentAngle.x, currentAngle.y = rear.body:getLinearVelocity()
             end
         end
