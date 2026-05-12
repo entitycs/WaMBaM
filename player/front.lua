@@ -1,6 +1,6 @@
 local Front = {}
-
-
+local RotVis = require("agent.glm.rotvis")
+local FrontRotVis = nil
 function Front:load(window, world, rear)
     self.size = rear.size
     self.torque = FrontWheelTorque(rear.force) --175 * dimmer
@@ -13,6 +13,11 @@ function Front:load(window, world, rear)
     self.body:setLinearDamping(1)
     self.body:setMass(FrontWheelMass(rear.body:getMass()))
     self.body:setGravityScale(FrontWheelGravityScale(rear.body:getGravityScale()))
+
+    -- rotation visualization
+    local name = "FrontLine"
+    FrontRotVis = RotVis:new(self.size, self.body, name)
+    -- FrontRotVis:load()
 end
 
 function Front:update(dt, window, world)
@@ -22,9 +27,13 @@ end
 function Front:draw()
     love.graphics.setColor(0.4, 1, 0.4)
     love.graphics.circle("fill",
-    self.body:getX(),
-    self.body:getY(),
+        self.body:getX(),
+        self.body:getY(),
         self.size --shape:getRadius()
     )
+    love.graphics.setColor(0, 0, 0)
+    if FrontRotVis ~= nil then FrontRotVis:draw() end
+    love.graphics.setColor(1, 1, 1)
 end
+
 return Front

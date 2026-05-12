@@ -2,6 +2,7 @@ require("core.ratios")
 require("current.arena")
 Arena = require("core.arena")
 JoystickInput = require("core.joystick")
+local Ball = require("core.ball")
 Moonshine = require("lib.moonshine")
 Shockwave = require("agent.copilot.shockwave")
 local Rear = require("player.rear")
@@ -44,7 +45,7 @@ local world
 -- local front = {}    -- second wheel
 local center = {}   -- connector
 
-local ball = {}     -- game ball
+-- local ball = {}     -- game ball
 
 function love.load()
     love.physics.setMeter(64)
@@ -65,13 +66,13 @@ function love.load()
     -- In love.load(), after creating fixtures:
     local wheelSize = 10
 
-    ball.body = love.physics.newBody(world, 400, 400, "dynamic")
-    ball.shape = love.physics.newCircleShape(BallSize(wheelSize))
-    ball.fixture = love.physics.newFixture(ball.body, ball.shape, 1)
-    ball.fixture:setRestitution(0.5)
-    ball.fixture:setFriction(0.1)
-    ball.fixture:setUserData({name = "Ball"})
-    ball.body:setMass(0.5)
+    -- ball.body = love.physics.newBody(world, 400, 400, "dynamic")
+    -- ball.shape = love.physics.newCircleShape(BallSize(wheelSize))
+    -- ball.fixture = love.physics.newFixture(ball.body, ball.shape, 1)
+    -- ball.fixture:setRestitution(0.5)
+    -- ball.fixture:setFriction(0.1)
+    -- ball.fixture:setUserData({name = "Ball"})
+    -- ball.body:setMass(0.5)
 
     -- Arena
     Arena:load(window, world)
@@ -79,6 +80,7 @@ function love.load()
     -- Per 'Round/Game' Arena
     CurrentArena:load(window, world)
 
+    Ball:load(window, world, BallSize(wheelSize))
     -- Player
     -- Rear 'Wheel'
     Rear:load(window, world, wheelSize)
@@ -179,12 +181,13 @@ function love.draw()
     )
     
     -- Draw ball
-    love.graphics.setColor(1, 1, 1)
-    love.graphics.circle("fill",
-    ball.body:getX(),
-    ball.body:getY(),
-        ball.shape:getRadius()
-    )
+    Ball:draw()
+    -- love.graphics.setColor(1, 1, 1)
+    -- love.graphics.circle("fill",
+    -- ball.body:getX(),
+    -- ball.body:getY(),
+    --     ball.shape:getRadius()
+    -- )
     
     -- Joystick debug
     JoystickInput:draw()
