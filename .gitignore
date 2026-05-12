@@ -1,2 +1,3 @@
 release/*.exe
 release/*.love
+.flask

@@ -142,8 +142,10 @@ todo: some/any kind of pixel filter applied based on visuals/interactions
 ---
 config:
     treeView:
-        rowIndent: 80
-        lineThickness: 3
+        rowIndent: 30
+        lineThickness: 1
+        paddingX: 1
+        paddingY: 1
     themeVariables:
         treeView:
             labelFontSize: '20px'
@@ -151,7 +153,16 @@ config:
             lineColor: '#2c8b2c'
 ---
 treeView-beta
+    "agent/"
+      "copilot/"
+        "images/"
+          "shockwave.png"
+          "shockwave2.png"
+        "shockwave.lua"
+      "glm"
+        "rotvis.lua"
     "backdrops/"
+      "maxresdefault.jpg"
     "core/"
       "arena.lua"
       "joystick.lua"
