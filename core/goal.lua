@@ -11,7 +11,7 @@ local function contains(t, val)
 end
 
 function Goal:new(world, ballSize, posX, posY, flip)
-    local goalSize = ballSize * 1.15
+    local goalSize = ballSize * 1.25
     local body = love.physics.newBody(world, posX, posY, "static")
     local points 
     if flip then
@@ -40,16 +40,15 @@ function Goal:new(world, ballSize, posX, posY, flip)
     local openEdges = {1}
     for i = 1, #points, 2 do
         if not contains(openEdges, i) then 
-                    
-            local x1 =     points[i]
-            local y1 =     points[(i + 1)]
+            local x1 = points[i]
+            local y1 = points[(i + 1)]
             local x2 = points[(i + 2)] or points[1]
-            local y2 =  points[(i + 3)] or points[2]
-            
+            local y2 = points[(i + 3)] or points[2]          
             local edgeShape = love.physics.newEdgeShape(x1, y1, x2, y2)
             edges[#edges + 1] = {
                 shape = edgeShape,
-                fixture = love.physics.newFixture(body, edgeShape, 1)
+                fixture = love.physics.newFixture(body, edgeShape, 1),
+                -- todo group for collisions
             }
         end
     end
@@ -57,7 +56,8 @@ function Goal:new(world, ballSize, posX, posY, flip)
     return setmetatable({
         body = body,
         shape = shape,
-        fixture = fixture
+        fixture = fixture,
+        edges = edges
     }, Goal)
 end
 
@@ -76,6 +76,16 @@ end
 function Goal:draw()
     love.graphics.setColor(255, 0, 0)
     love.graphics.polygon("fill", self.body:getWorldPoints(self.shape:getPoints()))
+    love.graphics.setColor(255, 255, 255)
+    local thickness = 2
+    for _, edgeData in ipairs(self.edges) do
+        local x1, y1, x2, y2 = edgeData.shape:getPoints()
+        -- Pass the 8 points directly as individual arguments
+        love.graphics.line( self.body:getWorldPoints(
+            x1, y1, 
+            x2, y2 
+        ))
+    end
     love.graphics.setColor(1, 1, 1)
 end
 

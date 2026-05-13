@@ -78,10 +78,10 @@ Noting that this is a minimal set of bits of knowledge, take note of the followi
 
 | Img | Name | Description |
 | --- | ---- | --------- |
-| ![Carry example gif](images/carry.gif) | Carry | Place the ball above the WaM'er and lift it off of the ground, balancing as the ball keeps steady contact with the WaM'er (rear 'wheel') |
-| ![WaM example gif](images/WaM.gif)  | WaM | Hit the ball with sufficient force using the rear 'wheel' |
-| ![BaM example gif](images/BaM.gif)  | BaM | Hit the ball with sufficient force using the front 'wheel' |
-| ![Carry WaMBaM example gif](images/WaMBaM.gif)  | WaMBaM | Transition from Carrying or from a WaM into a BaM |
+| ![Carry example gif](docs/images/carry.gif) | Carry | Place the ball above the WaM'er and lift it off of the ground, balancing as the ball keeps steady contact with the WaM'er (rear 'wheel') |
+| ![WaM example gif](docs/images/WaM.gif)  | WaM | Hit the ball with sufficient force using the rear 'wheel' |
+| ![BaM example gif](docs/images/BaM.gif)  | BaM | Hit the ball with sufficient force using the front 'wheel' |
+| ![Carry WaMBaM example gif](docs/images/WaMBaM.gif)  | WaMBaM | Transition from Carrying or from a WaM into a BaM |
 
 ## TODOs
 
@@ -155,7 +155,7 @@ config:
 treeView-beta
     "agent/"
       "copilot/"
-        "images/"
+        "docs/images/"
           "shockwave.png"
           "shockwave2.png"
         "shockwave.lua"
@@ -169,6 +169,7 @@ treeView-beta
       "ratios.lua"
     "current/"
       "arena.lua"
+      "goals.lua"
     "release/"
     "build.sh"
     "main.lua"
@@ -201,6 +202,12 @@ treeView-beta
 
 - Loads the arena background / other temporary arena settings
   
+#### current/goals.lua
+
+- Loads an initial goal example (high difficulty)
+  ![high difficulty goal example](docs/images/goal-high-difficulty.png)
+  ***Image**: ball sitting in red goal with white edges*
+
 ### core/
 
 - Holds files handling core, static settings / setup.
