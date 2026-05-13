@@ -210,6 +210,9 @@ treeView-beta
 
 - Sets up the core arena items, which might include goals, floor, walls, etc.
   
+> &nbsp;
+> **Arena** (the same as many other returned objects) is returned with callable **`load`**, **`update`**, and **`draw`** methods, meant to coincide with the global lifecycle.
+> 
 > ```mermaid
 > flowchart LR
 >   subgraph M[main.lua]
@@ -229,8 +232,8 @@ treeView-beta
 >   update --> update1
 >   draw --> draw1
 > ```
->
-> **Arena** (the same as many other returned objects) is returned with `load`, `update`, and `draw` methods, meant to coincide with the global lifecycle. ***Expected arguments may differ***
+>  *Expected arguments may differ*
+> &nbsp;
 
 ==Note==: The same require | mirror-lifecycle pattern is used for `JoystickInput`, `Ball`, `Arena`, `CurrentArena` (current/arena.lua) and `any new 'objects' added going forward` where applicable.  I will refrain from posting the same diagram with different names, and slim down class diagrams in the same spirit.
 
@@ -286,16 +289,18 @@ classDiagram
 - Provides functions taking taking values from the base control; `rear 'wheel'` as input, and yielding relative values for related components.
   - eg., changing `'wheel' size` should change `ball size` such that `carrying` and other mechanics resume working as expected / required.
 
-```mermaid
-flowchart LR
-  subgraph M["main.lua"]
-    R["`**rear**`"]
-    F["`**front**`"]
-    B["`**ball**`"]
-  end
-  C@{ shape: docs, label: "core/ratios.lua"}
-  R -->|physics, geometry| C -->|physics, geometry| F & B
-```
+> &nbsp;
+> **Ratio** input/output flow
+> ```mermaid
+> flowchart LR
+>   subgraph M["main.lua"]
+>     R["`**rear**`"]
+>     F["`**front**`"]
+>     B["`**ball**`"]
+>   end
+>   C@{ shape: docs, label: "core/ratios.lua"}
+>   R -->|physics, geometry| C -->|physics, geometry| F & B
+> ```
 
 ```mermaid
 classDiagram
@@ -319,9 +324,12 @@ classDiagram
 #### current/goals.lua
 
 - Loads and places initial goal examples (eg. the high difficulty default)
-  ![high difficulty goal example](docs/images/goal-high-difficulty.png)
   
-  ***Image**: ball sitting in red goal with white edges*
+> &nbsp;
+> ***Image**: ball sitting in red goal with white edges*
+>
+> ![high difficulty goal example](docs/images/goal-high-difficulty.png)
+>
 
 - Alternatively, custom / other goal types are planned.
 
