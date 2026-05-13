@@ -10,9 +10,9 @@ function Ball:drop(x_pos, y_pos)
     self.body:setY(y_pos)
 end
 
-function Ball:load(window, world, size)
-    self.body = love.physics.newBody(world, window.right / 2, window.top, "dynamic")
-    self.shape = love.physics.newCircleShape(size)
+function Ball:load(window, world, radius)
+    self.body = love.physics.newBody(world, window.right / 2 - radius / 2, window.top, "dynamic")
+    self.shape = love.physics.newCircleShape(radius)
     self.fixture = love.physics.newFixture(self.body, self.shape, 1)
     self.fixture:setRestitution(0.5)
     self.fixture:setFriction(0.1)
@@ -21,7 +21,7 @@ function Ball:load(window, world, size)
 
     -- Create a line shape for rotation visualization (glm-4.7)
     local name = "BallLine"
-    BallRotVis = RotVis:new(size, self.body, name)
+    BallRotVis = RotVis:new(radius, self.body, name)
     BallRotVis:load()
 end
 

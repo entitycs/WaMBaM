@@ -18,7 +18,7 @@ function Rear:load(window, world, size)
     self.fixture:setUserData({name = "Rear"})
     self.body:setMass(2)
     self.body:setGravityScale(3)
-    self.body:setAngularDamping(1)
+    self.body:setAngularDamping(0)
     local dimmer = 1.0
     self.force = 500 * dimmer
     RearRotVis = RotVis:new(self.size, self.body, "RearRotation")

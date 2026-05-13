@@ -65,22 +65,14 @@ function love.load()
 
     -- In love.load(), after creating fixtures:
     local wheelSize = 10
-
-    -- ball.body = love.physics.newBody(world, 400, 400, "dynamic")
-    -- ball.shape = love.physics.newCircleShape(BallSize(wheelSize))
-    -- ball.fixture = love.physics.newFixture(ball.body, ball.shape, 1)
-    -- ball.fixture:setRestitution(0.5)
-    -- ball.fixture:setFriction(0.1)
-    -- ball.fixture:setUserData({name = "Ball"})
-    -- ball.body:setMass(0.5)
-
+    local ballRadius = BallSize(wheelSize)
     -- Arena
     Arena:load(window, world)
 
     -- Per 'Round/Game' Arena
-    CurrentArena:load(window, world)
+    CurrentArena:load(window, world, ballRadius)
 
-    Ball:load(window, world, BallSize(wheelSize))
+    Ball:load(window, world, ballRadius)
     -- Player
     -- Rear 'Wheel'
     Rear:load(window, world, wheelSize)

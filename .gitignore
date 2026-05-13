@@ -1,3 +1,4 @@
 release/*.exe
 release/*.love
 .flask
+.vscode
