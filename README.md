@@ -165,6 +165,8 @@ treeView-beta
       "maxresdefault.jpg"
     "core/"
       "arena.lua"
+      "ball.lua"
+      "goal.lua"
       "joystick.lua"
       "ratios.lua"
     "current/"
@@ -183,74 +185,82 @@ treeView-beta
 ### main.lua
 
 - Main script
-
+  - All game logic leads from here.
+  - Gets required tables / types. 
+  - Defines main callbacks.
+  - Calls load, update, and/or draw methods of instantiated or referenced objects.
+  
 ### build.sh
 
 - Build from linux / wsl
   - Produces .exe and .love executables. 
   - Attempts to copy windows dlls from `c:/Program Files/LOVE/`
+    - Alternatively, copy them manually from your local install location to the `release/` folder.
 
 ### release/
 
-- Build script target location
+- ==Build script target location==.
   
-### current/
-
-- Holds logic concerned with the current game / round **(volatile)**.
-
-#### current/arena.lua
-
-- Loads the arena background / other temporary arena settings
-  
-#### current/goals.lua
-
-- Loads an initial goal example (high difficulty)
-  ![high difficulty goal example](docs/images/goal-high-difficulty.png)
-  ***Image**: ball sitting in red goal with white edges*
 
 ### core/
 
-- Holds files handling core, static settings / setup.
+- ==Holds files handling core, static settings / setup==.
 
 #### core/arena.lua
 
 - Sets up the core arena items, which might include goals, floor, walls, etc.
   
-```mermaid
-flowchart LR
-  subgraph M[main.lua]
-    load
-    update
-    draw
-  end
-  subgraph J["core/arena.lua"]
-    subgraph J1["Arena"]
-    load1["load"]
-    update1["update"]
-    draw1["draw"]
-    end
-  end
-  J1 -->|= require| M
-  load --> load1
-  update --> update1
-  draw --> draw1
-```
+> ```mermaid
+> flowchart LR
+>   subgraph M[main.lua]
+>     load
+>     update
+>     draw
+>   end
+>   subgraph J["core/arena.lua"]
+>     subgraph J1["Arena"]
+>     load1["load"]
+>     update1["update"]
+>     draw1["draw"]
+>     end
+>   end
+>   J1 -->|= require| M
+>   load --> load1
+>   update --> update1
+>   draw --> draw1
+> ```
+>
+> **Arena** (the same as many other returned objects) is returned with `load`, `update`, and `draw` methods, meant to coincide with the global lifecycle. ***Expected arguments may differ***
 
-##### Arena class diagram
+==Note==: The same require | mirror-lifecycle pattern is used for `JoystickInput`, `Ball`, `Arena`, `CurrentArena` (current/arena.lua) and `any new 'objects' added going forward` where applicable.  I will refrain from posting the same diagram with different names, and slim down class diagrams in the same spirit.
 
 ```mermaid
 classDiagram
   class Arena {
-    ceiling
+    top
     floor
-    leftwall
-    rightwall
+    left
+    right
     ...
-    -build(window, world)
     +load(window, world)
+    +draw()
+    ...(tbd)
+  }
+```
+
+#### core/ball.lua
+
+- Handles creation, updates, display, and other core behavior for the ball.
+  
+```mermaid
+classDiagram
+  class Ball {
+    -RotVis BallRotVis
+    +drop(xPos, yPos)
+    +load(window, world, radius)
     +update(dt)
     +draw()
-    ...()
+    ...(tbd)
   }
 ```
 
@@ -259,45 +269,21 @@ classDiagram
 - Handles setup, updates, and drawing related to joystick input.
 
 ```mermaid
-flowchart LR
-  subgraph M[main.lua]
-    load
-    update
-    draw
-  end
-  subgraph J["core/joystick.lua"]
-    subgraph J1["JoystickInput"]
-    load1["load"]
-    update1["update"]
-    draw1["draw"]
-    end
-  end
-  J1 -->|= require| M
-  load --> load1
-  update --> update1
-  draw --> draw1
-```
-
-Note: The same require / mirror-lifecycle pattern is used for `JoystickInput`, `Arena`, `CurrentArena` (current/arena.lua) and `any new 'objects' added going forward`.
-
-##### JoystickInput class diagram
-
-```mermaid
 classDiagram
   class JoystickInput {
-    ...
-    -build(window, world)
-    +load(window, world)
-    +update(dt)
+    lambda: love.gamepadpressed
+    lambda: love.joystickadded
+    +load()
+    +update(dt, rear, front)
     +draw()
-    ...()
+    ...(tbd)
   }
 ```
 
 #### core/ratios.lua
 
-- Used to provide relative values for the remaining physics and geometry. 
-- Provides functions taking taking values from the base control; `rear 'wheel'` as input, and yielding relative values for related components. 
+- Used to provide relative values for the remaining physics and geometry.
+- Provides functions taking taking values from the base control; `rear 'wheel'` as input, and yielding relative values for related components.
   - eg., changing `'wheel' size` should change `ball size` such that `carrying` and other mechanics resume working as expected / required.
 
 ```mermaid
@@ -311,8 +297,6 @@ flowchart LR
   R -->|physics, geometry| C -->|physics, geometry| F & B
 ```
 
-##### global class diagram
-
 ```mermaid
 classDiagram
   class Ratios{
@@ -320,13 +304,39 @@ classDiagram
     +FrontWheelMass(rearWheelMass)
     +FrontWheelGravityScale(rearWheelGravityScale)
     +FrontWheelTorque(rearWheelForce)
-    ...()
+    ...(tbd)
   }
 ```
 
+### current/
 
+- Holds logic concerned with the current game / round ==**(volatile)**==.
+
+#### current/arena.lua
+
+- Loads the arena background / other temporary arena settings
+  
+#### current/goals.lua
+
+- Loads and places initial goal examples (eg. the high difficulty default)
+  ![high difficulty goal example](docs/images/goal-high-difficulty.png)
+  
+  ***Image**: ball sitting in red goal with white edges*
+
+- Alternatively, custom / other goal types are planned.
+
+#### lib/
+
+- ==Third Party Libraries==
+
+#### agent/
+
+- ==Resources (code, images, etc.) created with the help of AI, per model/service.  See `README` files per folder for more details==.
+  
 ## Credits
 
+- `todo`
+  
 ### Further Acknowledgements
 
 `Dedicated to the LOML`
