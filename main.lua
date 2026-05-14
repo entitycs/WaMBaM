@@ -7,45 +7,49 @@ Moonshine = require("lib.moonshine")
 Shockwave = require("agent.copilot.shockwave")
 local Rear = require("player.rear")
 local Front = require("player.front")
+local ContactHandler = require("core.contact")
 
 local logger = {}
-
+function love.conf(t)
+    t.console = true
+end
 local signifiers = {
-    effects = {},
-    normals = {}
+    effects = {}
 }
+
+
+function signifiers.testCallback(fixtureA, fixtureB, contact)
+
+end
+
+
 function signifiers.collisionOnEnter(fixture_a, fixture_b, contact)
     local ud_a = fixture_a:getUserData()
     local ud_b = fixture_b:getUserData()
-    print(ud_b)
+
+    -- Handle collisions between 'Front' and 'Ball'
     if (ud_a ~= nil and ud_b ~= nil) and ((ud_a["name"] == "Front") or (ud_b["name"] == "Front")) then
         if (ud_a["name"] == "Ball") or (ud_b["name"] == "Ball") then
-            print("made it")
 
             local point = {contact:getPositions()}
             for i = 1, #point, 2 do
                 local x, y = point[i], point[i + 1]
-                -- Cache the values inside the contacts because they're not guaranteed
+                -- Cache the values inside the Contacts because they're not guaranteed
                 -- to be valid later in the frame. (fron love docs)
-                -- table.insert(signifiers.normals, { x, y, x + dx, y + dy })
                 table.insert(signifiers.effects, Shockwave.new(x, y))
             end 
         end
     end
-    
-
     -- do not use contact after this function returns
 end
 local window = {}
-
 local world
 
--- local floor = {}    -- floor/ground
--- local rear = {}     -- main wheel
--- local front = {}    -- second wheel
-local center = {}   -- connector
+local function reloadBall(fixtureA, fixtureB, contact)
+    Ball:drop(200, 30)
+end
 
--- local ball = {}     -- game ball
+local center = {}   -- connector
 
 function love.load()
     love.physics.setMeter(64)
@@ -55,12 +59,22 @@ function love.load()
     window.top = 0
     window.right = 1200
     window.bottom = 600
-    
+
     -- Set the window size
     love.window.setMode(window.right, window.bottom)
+
+    -- Create new World
     world = love.physics.newWorld(0, 90, true)
-    world:setCallbacks(signifiers.collisionOnEnter)
+    -- Set contact handling callback
+    local contactHandler = ContactHandler.new(world)
+    world:setCallbacks(contactHandler.beginContact)
     
+    -- Add to contact handling callback list, post-set!
+    contactHandler:addBegin("Front", "Ball", signifiers.collisionOnEnter)
+    contactHandler:addBegin("Ball", "Goal1", reloadBall)
+    contactHandler:addBegin("Ball", "Goal2", reloadBall)
+
+
     Shockwave:load()
 
     -- In love.load(), after creating fixtures:
@@ -74,9 +88,9 @@ function love.load()
 
     Ball:load(window, world, ballRadius)
     -- Player
-    -- Rear 'Wheel'
+    -- - Rear 'Wheel'
     Rear:load(window, world, wheelSize)
-    -- Front 'Wheel'
+    -- - Front 'Wheel'
     Front:load(window, world, Rear)
 
     -- 'Center/Body' (no collision)
@@ -86,10 +100,8 @@ function love.load()
         Front.body:getX(), Front.body:getY(),
         false -- do not collide with each other
     )
-        
     Directions = { "up", "down", "left", "right" }
     DirectionTargets = { "y", "y", "x", "x" }
-
 end
 
 
@@ -97,15 +109,17 @@ function love.update(dt)
     world:update(dt)
     local limitingVel = 400
 
-    for i = #signifiers.effects, 1, -1 do
+    -- update ball
+    Ball:update(dt)
+
+    -- backwards iteration - safer for removals
+    for i = #signifiers.effects, 1, -1 do 
         local e = signifiers.effects[i]
         e:update(dt)
         if e.dead then
             table.remove(signifiers.effects, i)
         end
     end
-
-    -- Update game state here (e.g., handle input, update characters, etc.)
 
     -- joystick input (up to date)
     JoystickInput:update(dt, Rear, Front)
@@ -117,13 +131,15 @@ function love.update(dt)
     local limitedY = false
     local curVel_x, curVel_y = Rear.body:getLinearVelocity()
 
-    if math.abs(curVel_x) + math.abs(curVel_y) > limitingVel then 
+    -- determine player acceleration limits based on current velocity
+    if math.abs(curVel_x) + math.abs(curVel_y) > limitingVel then
         if math.abs(curVel_x) > math.abs(curVel_y) then
             limitedX = true
         else
             limitedY = true
         end
     end
+    -- loop through (poll) defined keyboard inputs as directions
     for i, dir in ipairs(Directions) do -- todo, sep. loop for joystick
         local dirdt = dt * Rear.force
         if love.keyboard.isDown(dir) then
