@@ -6,8 +6,7 @@ local BallRotVis = nil
 function Ball:drop(x_pos, y_pos)
     self.x = x_pos
     self.y = y_pos
-    self.body:setX(x_pos)
-    self.body:setY(y_pos)
+    self.needsUpdate = true
 end
 
 function Ball:load(window, world, radius)
@@ -25,8 +24,12 @@ function Ball:load(window, world, radius)
     BallRotVis:load()
 end
 
-function Ball:update(dt, window, world)
-
+function Ball:update(dt)
+    if self.needsUpdate then
+        self.body:setX(self.x)
+        self.body:setY(self.y)
+        self.needsUpdate = false
+    end
 end
 
 function Ball:draw()
@@ -39,17 +42,6 @@ function Ball:draw()
     love.graphics.setColor(0, 0, 0)
     -- Draw rotation indicator line (glm-4.7)
     if BallRotVis ~= nil then BallRotVis:draw() end
-    -- local angle = self.body:getAngle()
-    -- local radius = self.shape:getRadius()
-    -- local x = self.body:getX()
-    -- local y = self.body:getY()
-    
-    -- love.graphics.line(
-    --     x + math.cos(angle) * radius * 0.9,
-    --     y + math.sin(angle) * radius * 0.9,
-    --     x - math.cos(angle) * radius * 0.9,
-    --     y - math.sin(angle) * radius * 0.9
-    -- )
     love.graphics.setColor(1, 1, 1)
 end
 
