@@ -72,16 +72,16 @@ Noting that this is a minimal set of bits of knowledge, take note of the followi
 2. Applying Forces to one wheel will affect your ability to apply forces through the other wheel. Of course, you can and are meant to use both inputs to maneuver, but to have full control, you'll want to study and experiment some.
 3. Full control is not meant to really be achievable. At least at some points, your movement through the arena can only be described as "Que sera, sera" until you hit a wall, or the floor, or get lucky in getting reorientated.
 
-### Current Named Mechanics List 
+### Current Named Mechanics List
 
 (subject to change)
 
 | Img | Name | Description |
 | --- | ---- | --------- |
 | ![Carry example gif](docs/images/carry.gif) | Carry | Place the ball above the WaM'er and lift it off of the ground, balancing as the ball keeps steady contact with the WaM'er (rear 'wheel') |
-| ![WaM example gif](docs/images/WaM.gif)  | WaM | Hit the ball with sufficient force using the rear 'wheel' |
-| ![BaM example gif](docs/images/BaM.gif)  | BaM | Hit the ball with sufficient force using the front 'wheel' |
-| ![Carry WaMBaM example gif](docs/images/WaMBaM.gif)  | WaMBaM | Transition from Carrying or from a WaM into a BaM |
+| ![WaM example gif](docs/images/WaM.gif) | WaM | Hit the ball with sufficient force using the rear 'wheel' |
+| ![BaM example gif](docs/images/BaM.gif) | BaM | Hit the ball with sufficient force using the front 'wheel' |
+| ![Carry WaMBaM example gif](docs/images/WaMBaM.gif) | WaMBaM | Transition from Carrying or from a WaM into a BaM |
 
 ## TODOs
 
@@ -186,14 +186,14 @@ treeView-beta
 
 - Main script
   - All game logic leads from here.
-  - Gets required tables / types. 
+  - Gets required tables / types.
   - Defines main callbacks.
   - Calls load, update, and/or draw methods of instantiated or referenced objects.
   
 ### build.sh
 
 - Build from linux / wsl
-  - Produces .exe and .love executables. 
+  - Produces .exe and .love executables.
   - Attempts to copy windows dlls from `c:/Program Files/LOVE/`
     - Alternatively, copy them manually from your local install location to the `release/` folder.
 
@@ -201,7 +201,6 @@ treeView-beta
 
 - ==Build script target location==.
   
-
 ### core/
 
 - ==Holds files handling core, static settings / setup==.
@@ -212,7 +211,7 @@ treeView-beta
   
 > &nbsp;
 > **Arena** (the same as many other returned objects) is returned with callable **`load`**, **`update`**, and **`draw`** methods, meant to coincide with the global lifecycle.
-> 
+>
 > ```mermaid
 > flowchart LR
 >   subgraph M[main.lua]
@@ -232,7 +231,8 @@ treeView-beta
 >   update --> update1
 >   draw --> draw1
 > ```
->  *Expected arguments may differ*
+>
+> *Expected arguments may differ*
 > &nbsp;
 
 ==Note==: The same require | mirror-lifecycle pattern is used for `JoystickInput`, `Ball`, `Arena`, `CurrentArena` (current/arena.lua) and `any new 'objects' added going forward` where applicable.  I will refrain from posting the same diagram with different names, and slim down class diagrams in the same spirit.
@@ -291,6 +291,7 @@ classDiagram
 
 > &nbsp;
 > **Ratio** input/output flow
+>
 > ```mermaid
 > flowchart LR
 >   subgraph M["main.lua"]
