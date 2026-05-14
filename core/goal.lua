@@ -14,36 +14,37 @@ function Goal:new(world, ballSize, posX, posY, flip)
     local goalSize = ballSize * 1.25
     local body = love.physics.newBody(world, posX, posY, "static")
     local points 
-    if flip then
-        -- shape = love.physics.newPolygonShape(
-            points = {
-                0, 0,
-                -goalSize, 0,
-                -goalSize / 2, goalSize,
-                0, goalSize
-            }
-        else
-            -- shape = love.physics.newPolygonShape(
-                points = {
-                    0, 0,
-                    goalSize, 0,
-                    goalSize / 2, goalSize,
-                    0, goalSize
-                }
-            end
-            
+    if flip then -- for left/right side of map
+        points = {
+            0, 0,
+            -goalSize, 0,
+            -goalSize / 2, goalSize,
+            0, goalSize
+        }
+    else
+        points = {
+            0, 0,
+            goalSize, 0,
+            goalSize / 2, goalSize,
+            0, goalSize
+        }
+    end
+        
     local shape = love.physics.newPolygonShape(points)
     local fixture = love.physics.newFixture(body, shape, 30)
     fixture:setSensor(true)
 
     local edges = {}
-    local openEdges = {1}
+    local openEdges = { 1 }
+    
+    -- Edge padding to keep goal collision from bleeding through edges
+    local edgePadding = 1.1
     for i = 1, #points, 2 do
         if not contains(openEdges, i) then 
-            local x1 = points[i]
-            local y1 = points[(i + 1)]
-            local x2 = points[(i + 2)] or points[1]
-            local y2 = points[(i + 3)] or points[2]          
+            local x1 = points[i] * edgePadding
+            local y1 = points[(i + 1)] * edgePadding
+            local x2 = (points[(i + 2)] or points[1]) * edgePadding
+            local y2 = (points[(i + 3)] or points[2]) * edgePadding
             local edgeShape = love.physics.newEdgeShape(x1, y1, x2, y2)
             edges[#edges + 1] = {
                 shape = edgeShape,
