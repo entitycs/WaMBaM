@@ -46,7 +46,7 @@ local window = {}
 local world
 
 local function reloadBall(fixtureA, fixtureB, contact)
-    Ball:drop(200, 30)
+    Ball:drop(window.right / 2 - Ball.shape:getRadius() / 2, 30)
 end
 
 local center = {}   -- connector
