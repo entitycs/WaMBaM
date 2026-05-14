@@ -6,6 +6,8 @@ local Goals = {}
 function Goals:load(window, world, ballSize)
     Goal1 = Goal:new(world, ballSize, window.left, window.bottom / 3, false) -- Load first goal
     Goal2 = Goal:new(world, ballSize, window.right, window.bottom / 3, true) -- Load second goal
+    Goal1.fixture:setUserData({ name = "Goal1" })
+    Goal2.fixture:setUserData({ name="Goal2" })
 end
 
 function Goals:draw()
