@@ -267,6 +267,39 @@ classDiagram
   }
 ```
 
+#### core/contact.lua
+
+- Handles world collisions 
+- Pub/Sub pattern allowing for adding/removing callbacks
+  - implemented for `begin` callback only initially.
+  - other callbacks will be implemented here if necessary, alongside the `begin` table.
+
+```mermaid
+classDiagram
+  class ContactHandler {
+    +new(world)
+    -beginContact(fixtureA, fixtureB, contact)
+    +addBegin(nameFixtureA, nameFixtureB, handler)
+    +removeBegin(handler)
+    ...(tbd)
+  }
+```
+
+#### core/goal.lua
+
+- Defines a default Goal type
+
+```mermaid
+classDiagram
+  class Goal {
+    +new(world, ballSize, posX, posY, flip)
+    +load(scoreGroup)
+    +update(dt)
+    +draw()
+    ...(tbd)
+  }
+```
+
 #### core/joystick.lua
 
 - Handles setup, updates, and drawing related to joystick input.
@@ -285,10 +318,24 @@ classDiagram
 
 #### core/ratios.lua
 
-- Used to provide relative values for the remaining physics and geometry.
+- Used to provide relative values for influenced physics/geometry constraints.
 - Provides functions taking taking values from the base control; `rear 'wheel'` as input, and yielding relative values for related components.
   - eg., changing `'wheel' size` should change `ball size` such that `carrying` and other mechanics resume working as expected / required.
-
+  
+> &nbsp;
+> **Ratio** Class
+>
+>```mermaid
+>classDiagram
+>  class Ratios{
+>    +BallSize(rearWheelSize)
+>    +FrontWheelMass(rearWheelMass)
+>    +FrontWheelGravityScale(rearWheelGravityScale)
+>    +FrontWheelTorque(rearWheelForce)
+>    ...(tbd)
+>  }
+>```
+>
 > &nbsp;
 > **Ratio** input/output flow
 >
@@ -302,17 +349,6 @@ classDiagram
 >   C@{ shape: docs, label: "core/ratios.lua"}
 >   R -->|physics, geometry| C -->|physics, geometry| F & B
 > ```
-
-```mermaid
-classDiagram
-  class Ratios{
-    +BallSize(rearWheelSize)
-    +FrontWheelMass(rearWheelMass)
-    +FrontWheelGravityScale(rearWheelGravityScale)
-    +FrontWheelTorque(rearWheelForce)
-    ...(tbd)
-  }
-```
 
 ### current/
 
