@@ -2,39 +2,15 @@ require("core.ratios")
 require("current.arena")
 Arena = require("core.arena")
 JoystickInput = require("core.joystick")
+KeyboardInput = require("core.keyboard")
 local Ball = require("core.ball")
--- Moonshine = require("lib.moonshine")
--- Shockwave = require("agent.copilot.shockwave")
 local Rear = require("player.rear")
 local Front = require("player.front")
 local ContactHandler = require("core.contact")
 
-local logger = {}
-
-
 function love.conf(t)
     t.console = true
 end
-
--- local signifiers = {
---     effects = {}
--- }
-
-
--- function signifiers.testCallback(fixtureA, fixtureB, contact)
-
--- end
-
--- function signifiers.collisionOnEnter(fixture_a, fixture_b, contact)
---     -- Handle collisions between 'Front' and 'Ball'
---     local point = { contact:getPositions() }
---     for i = 1, #point, 2 do
---         local x, y = point[i], point[i + 1]
---         -- Cache the values inside the (volatile) Contacts (fron love docs)
---         table.insert(signifiers.effects, Shockwave.new(x, y))
---     end
---     -- do not use contact after this function returns
--- end
 
 local window = {}
 local world
@@ -45,10 +21,9 @@ end
 
 local center = {} -- connector
 
+local limitingVel = 400
 function love.load()
     love.physics.setMeter(64)
-    -- effect = Moonshine(Moonshine.effects.glow)
-    JoystickInput:load()
     window.left = 0
     window.top = 0
     window.right = 1200
@@ -88,6 +63,9 @@ function love.load()
         false -- do not collide with each other
     )
 
+    KeyboardInput:load(Rear, Front, limitingVel)
+    JoystickInput:load(Rear, Front, limitingVel)
+
     -- Arena
     Arena:load(window, world)
 
@@ -99,8 +77,6 @@ function love.load()
 end
 
 function love.update(dt)
-    local limitingVel = 400
-
     -- update world
     world:update(dt)
 
@@ -108,39 +84,10 @@ function love.update(dt)
     Ball:update(dt)
 
     -- joystick input (up to date)
-    JoystickInput:update(dt, Rear, Front)
+    JoystickInput:update(dt)
     Rear:update(dt)
     Front:update(dt)
-
-    -- keyboard input (lagging behind)
-    -- loop through directions
-    local limitedX = false
-    local limitedY = false
-    local curVel_x, curVel_y = Rear.body:getLinearVelocity()
-
-    -- determine player acceleration limits/constraints based on current velocity
-    if math.abs(curVel_x) + math.abs(curVel_y) > limitingVel then
-        if math.abs(curVel_x) > math.abs(curVel_y) then
-            limitedX = true
-        else
-            limitedY = true
-        end
-    end
-    -- loop through (poll) defined keyboard inputs as directions
-    for i, dir in pairs(Directions) do -- todo, sep. loop for joystick
-        local dirdt = dt * Rear.force
-        if love.keyboard.isDown(dir) then
-            if i % 2 == 1 then
-                dirdt = -dirdt -- Reverse direction if odd
-            end
-            -- Only apply implulse if not limited by velocity constraint
-            if DirectionTargets[i] == "x" and not limitedX then
-                Rear.body:applyLinearImpulse(dirdt, 0)
-            elseif not limitedY then
-                Rear.body:applyLinearImpulse(0, dirdt)
-            end
-        end
-    end
+    KeyboardInput:update(dt)
 end
 
 function love.draw()

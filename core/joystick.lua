@@ -14,16 +14,18 @@ function love.gamepadpressed(joystick, button)
 end
 
 
-function JoystickInput:load()
+function JoystickInput:load(rear, front, limitingVel)
 --  local joysticks = love.joystick.getJoysticks()
     joystick = nil
     currentAngle.x, currentAngle.y = 0, 0
     currentAngle.changed = false
+    self.rear = rear
+    self.front = front
+    self.limitingVel = limitingVel
 end
 
 
-function JoystickInput:update(dt, rear, front)
-    local limitingVel = 400
+function JoystickInput:update(dt)
     local limitedX = false
     local limitedY = false
     if joystick  ~= nil then
@@ -32,25 +34,25 @@ function JoystickInput:update(dt, rear, front)
 
         -- Braking
         if triggerval ~= 0 then
-            currentAngle.x, currentAngle.y = rear.body:getLinearVelocity()
+            currentAngle.x, currentAngle.y = self.rear.body:getLinearVelocity()
             currentAngle.changed = true
-            front.body:setLinearDamping(50 * triggerval + 0.5)
-            front.body:setAngularDamping(50 * triggerval + 0.5)
-            local curx, cury = front.body:getLinearVelocity()
+            self.front.body:setLinearDamping(50 * triggerval + 0.5)
+            self.front.body:setAngularDamping(50 * triggerval + 0.5)
+            local curx, cury = self.front.body:getLinearVelocity()
             -- front.body:setLinearVelocity(curx * (1 - triggerval) , cury * (1 - triggerval))
         elseif currentAngle.changed then
-            local newx, newy = rear.body:getLinearVelocity()
-            local newx2, newy2 = front.body:getLinearVelocity()
-            rear.body:setLinearVelocity((newx + newx2) / 2, (newy + newy2) / 2)
-            front.body:setLinearVelocity((newx + newx2) / 2, (newy + newy2) / 2)
-            front.body:setLinearDamping(0.75)
-            rear.body:setLinearDamping(0.1)
+            local newx, newy = self.rear.body:getLinearVelocity()
+            local newx2, newy2 = self.front.body:getLinearVelocity()
+            self.rear.body:setLinearVelocity((newx + newx2) / 2, (newy + newy2) / 2)
+            self.front.body:setLinearVelocity((newx + newx2) / 2, (newy + newy2) / 2)
+            self.front.body:setLinearDamping(0.75)
+            self.rear.body:setLinearDamping(0.1)
             currentAngle.changed = false
         end
 
         -- Accelerating
-        local curVel_x, curVel_y = rear.body:getLinearVelocity()
-        if math.abs(curVel_x) + math.abs(curVel_y) > limitingVel then 
+        local curVel_x, curVel_y = self.rear.body:getLinearVelocity()
+        if math.abs(curVel_x) + math.abs(curVel_y) > self.limitingVel then 
             if math.abs(curVel_x) > math.abs(curVel_y) then
                 limitedX = true
             else
@@ -58,18 +60,18 @@ function JoystickInput:update(dt, rear, front)
             end
         end
         if joystick:getGamepadAxis("leftx") ~= 0 and not limitedX then
-            local totalForce = 2 * rear.force * dt * joystick:getGamepadAxis("leftx")
+            local totalForce = 2 * self.rear.force * dt * joystick:getGamepadAxis("leftx")
             totalForce = totalForce * (1 + trigger2)
-            rear.body:applyLinearImpulse(totalForce, 0)
+            self.rear.body:applyLinearImpulse(totalForce, 0)
         end
         if joystick:getGamepadAxis("lefty") ~= 0 and not limitedY then
-            local totalForce = rear.force * dt * joystick:getGamepadAxis("lefty")
+            local totalForce = self.rear.force * dt * joystick:getGamepadAxis("lefty")
             totalForce = totalForce * (1 + trigger2)
-            rear.body:applyLinearImpulse(0, totalForce)
+            self.rear.body:applyLinearImpulse(0, totalForce)
         end
         
-        curVel_x, curVel_y = front.body:getLinearVelocity()
-        if math.abs(curVel_x) + math.abs(curVel_y) > limitingVel then 
+        curVel_x, curVel_y = self.front.body:getLinearVelocity()
+        if math.abs(curVel_x) + math.abs(curVel_y) > self.limitingVel then 
             if math.abs(curVel_x) > math.abs(curVel_y) then
                 limitedX = true
             else
@@ -77,22 +79,22 @@ function JoystickInput:update(dt, rear, front)
             end
         end
         if joystick:getGamepadAxis("righty") ~= 0 and not limitedY then
-            if rear.body:getX() == front.body:getX() then
-                front.body = front.body
+            if self.rear.body:getX() == self.front.body:getX() then
+                self.front.body = self.front.body
             else
-                currentAngle.impulse = front.torque * dt * joystick:getGamepadAxis("righty")
-                front.body:applyLinearImpulse(0, currentAngle.impulse)
-                rear.body:applyLinearImpulse(0, - .65 * currentAngle.impulse)
-                currentAngle.x, currentAngle.y = rear.body:getLinearVelocity()
+                currentAngle.impulse = self.front.torque * dt * joystick:getGamepadAxis("righty")
+                self.front.body:applyLinearImpulse(0, currentAngle.impulse)
+                self.rear.body:applyLinearImpulse(0, - .65 * currentAngle.impulse)
+                currentAngle.x, currentAngle.y = self.rear.body:getLinearVelocity()
             end
         end
         if joystick:getGamepadAxis("rightx") ~= 0 and not limitedX then
-            if rear.body:getX() == front.body:getX() then
-                front.body = front.body
+            if self.rear.body:getX() == self.front.body:getX() then
+                self.front.body = self.front.body
             else
-                currentAngle.impulse = front.torque * dt * joystick:getGamepadAxis("rightx")
-                front.body:applyLinearImpulse(currentAngle.impulse, 0)
-                currentAngle.x, currentAngle.y = rear.body:getLinearVelocity()
+                currentAngle.impulse = self.front.torque * dt * joystick:getGamepadAxis("rightx")
+                self.front.body:applyLinearImpulse(currentAngle.impulse, 0)
+                currentAngle.x, currentAngle.y = self.rear.body:getLinearVelocity()
             end
         end
     end
