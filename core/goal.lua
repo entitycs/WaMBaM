@@ -2,7 +2,7 @@ local Goal = {}
 Goal.__index = Goal
 
 local function contains(t, val)
-    for _, v in ipairs(t) do
+    for _, v in pairs(t) do
         if v == val then
             return true
         end

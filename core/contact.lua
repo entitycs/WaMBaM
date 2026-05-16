@@ -40,7 +40,7 @@ function ContactHandler.new(world)
             end
         end
         -- Handle collisions between 'Front' and 'Ball'
-        for i, o in ipairs(handlers.begin) do
+        for i, o in pairs(handlers.begin) do
             -- copy fixture names for handler
             local names = {o.names[1], o.names[2]}
             local handler = o.handler

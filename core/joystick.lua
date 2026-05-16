@@ -102,7 +102,7 @@ end
 function JoystickInput:draw()
     local joysticks = love.joystick.getJoysticks()
     if joystick  ~= nil then
-        for i, joystick in ipairs(joysticks) do
+        for i, joystick in pairs(joysticks) do
             love.graphics.print(joystick:getName(), 10, i * 20)
             for j = 1, 2 do
                 love.graphics.setColor(0, 1, 0) -- Green for axes
