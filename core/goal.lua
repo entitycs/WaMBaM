@@ -38,7 +38,7 @@ function Goal:new(world, ballSize, posX, posY, flip)
     local openEdges = { 1 }
     
     -- Edge padding to keep goal collision from bleeding through edges
-    local edgePadding = 1.1
+    local edgePadding = 1.05
     for i = 1, #points, 2 do
         if not contains(openEdges, i) then 
             local x1 = points[i] * edgePadding
