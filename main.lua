@@ -1,15 +1,16 @@
 require("core.ratios")
 require("current.arena")
+local Menu = require("core.state.menu")
 Arena = require("core.arena")
-JoystickInput = require("core.joystick")
-KeyboardInput = require("core.keyboard")
+JoystickInput = require("core.input.joystick")
+KeyboardInput = require("core.input.keyboard")
 local Ball = require("core.ball")
 local Rear = require("player.rear")
 local Front = require("player.front")
 local ContactHandler = require("core.contact")
 
 function love.conf(t)
-    t.console = true
+    t.console = true09
 end
 
 local window = {}
@@ -34,7 +35,7 @@ function love.load()
 
     -- Create new World
     world = love.physics.newWorld(0, 90, true)
-
+    Menu:load()
     -- Set contact handling callback
     local contactHandler = ContactHandler.new(world)
     world:setCallbacks(contactHandler.beginContact)
@@ -77,6 +78,11 @@ function love.load()
 end
 
 function love.update(dt)
+    
+    local isResume = Menu:update(dt)
+    
+    if not isResume then return end
+    
     -- update world
     world:update(dt)
 
@@ -85,6 +91,7 @@ function love.update(dt)
 
     -- joystick input (up to date)
     JoystickInput:update(dt)
+    
     Rear:update(dt)
     Front:update(dt)
     KeyboardInput:update(dt)
@@ -122,4 +129,6 @@ function love.draw()
 
     -- Draw joystick (ie. debugging)
     JoystickInput:draw()
+    Menu:draw(window)
+
 end
