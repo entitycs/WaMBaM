@@ -21,7 +21,7 @@ classDef Current fill:white
 classDef Next fill:aqua
 ```
 
-State machine has no motion of Paused from this state
+State machine has no notion of Paused from this state
 
 ```mermaid
 
