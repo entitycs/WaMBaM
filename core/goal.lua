@@ -67,10 +67,7 @@ function Goal:load(scoreGroup)
 end
 
 function Goal:update(dt)
-    -- todo: collision detection ... or give name and use callbacks GL_ARB_provoking_vertex
-    -- what else here...?
-    -- how does the ball reset after a goal if it needs to?
-    -- should all goals be reset when scoreGroup is updated?
+    -- todo: collision detection ... (see ContactHandler)
 
 end
 

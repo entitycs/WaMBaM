@@ -21,7 +21,6 @@ function Ball:load(window, world, radius)
     -- Create a line shape for rotation visualization (glm-4.7)
     local name = "BallLine"
     BallRotVis = RotVis:new(radius, self.body, name)
-    -- BallRotVis:load()
 end
 
 function Ball:update(dt)
