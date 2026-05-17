@@ -48,8 +48,8 @@ function JoystickInput:update(dt)
             local newx2, newy2 = self.front.body:getLinearVelocity()
             self.rear.body:setLinearVelocity((newx + newx2) / 2, (newy + newy2) / 2)
             self.front.body:setLinearVelocity((newx + newx2) / 2, (newy + newy2) / 2)
-            self.front.body:setLinearDamping(0)
-            self.rear.body:setLinearDamping(0.1)
+            self.front.body:setLinearDamping(0.25)
+            self.rear.body:setLinearDamping(0.5)
             currentAngle.changed = false
         end
 
