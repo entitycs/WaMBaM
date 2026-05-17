@@ -1,13 +1,20 @@
 local ContactHandler = {}
 ContactHandler.__index = ContactHandler
-
+local function contains(t, val)
+    for _, v in pairs(t) do
+        if v == val then
+            return true
+        end
+    end
+    return false
+end
 -- Add Begin callback
 --- func desc
 ---@param nameFixtureA string
 ---@param nameFixtureB string
 ---@param handler function
 function ContactHandler:addBegin(nameFixtureA, nameFixtureB, handler)
-    table.insert(self.handlers.begin, {names = {nameFixtureA, nameFixtureB}, handler = handler})
+    table.insert(self.handlers.begin, { names = { nameFixtureA, nameFixtureB }, handler = handler })
 end
 
 -- Remove Begin callback
@@ -21,7 +28,6 @@ function ContactHandler:removeBegin(handler)
 end
 
 function ContactHandler.new(world)
-    
     local handlers = {
         begin = {}
     }
@@ -39,10 +45,10 @@ function ContactHandler.new(world)
                 print(k, v)
             end
         end
-        -- Handle collisions between 'Front' and 'Ball'
+        -- Handle collisions between eg. 'Front' and 'Ball'
         for i, o in pairs(handlers.begin) do
             -- copy fixture names for handler
-            local names = {o.names[1], o.names[2]}
+            local names = { o.names[1], o.names[2] }
             local handler = o.handler
             -- remove from local fixture names copy if matched
             if (ud_a ~= nil and ud_b ~= nil) then
@@ -51,12 +57,6 @@ function ContactHandler.new(world)
                         table.remove(names, j)
                     end
                 end
-                for j = #names, 1, -1 do
-                    if names[j] == ud_a["name"] or names[j] == ud_b["name"] then
-                        table.remove(names, j)
-                    end
-                end
-                -- matched if both names found (removed from local copy)
                 if #names == 0 then
                     handler(fixtureA, fixtureB, contact)
                 end
