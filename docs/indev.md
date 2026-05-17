@@ -13,12 +13,13 @@ Paused --> Exit & Landing & Game
 ```mermaid
 
 flowchart LR
-Landing:::Current --> Game:::Next & Exit:::Next
+Landing:::Current --> Game:::Next & Exit:::End
 Game --> Paused
 Paused --> Exit & Landing & Game
 
-classDef Current fill:white
-classDef Next fill:aqua
+classDef Current fill:black,color:white
+classDef Next fill:aqua,color:black
+classDef End fill:#f28,color:#efe
 ```
 
 State machine has no notion of Paused from this state
@@ -30,8 +31,8 @@ Landing --> Game:::Current & Exit
 Game --> Paused:::Next
 Paused --> Exit & Landing & Game
 
-classDef Current fill:white
-classDef Next fill:aqua
+classDef Current fill:black,color:white
+classDef Next fill:aqua,color:black
 ```
 
 State Machine only knows paused state as reachable
@@ -43,8 +44,8 @@ Landing --> Game & Exit:::End
 Game --> Paused:::Current
 Paused --> Exit & Landing:::Next & Game:::Next
 
-classDef Current fill:white
-classDef Next fill:aqua
+classDef Current fill:black,color:white
+classDef Next fill:aqua,color:black
 classDef End fill:#f28,color:#efe
 ```
 
