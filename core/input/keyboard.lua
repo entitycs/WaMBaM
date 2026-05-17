@@ -1,5 +1,14 @@
 local KeyboardInput = {}
 
+local lastKey = "none"
+
+
+function love.keypressed(key, scancode, isrepeat)
+    if not isrepeat then
+        lastKey = key
+    end
+end
+
 
 function KeyboardInput:load(rear, front, limitingVel)
     self.rear = rear

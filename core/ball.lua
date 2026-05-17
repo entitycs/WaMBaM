@@ -16,7 +16,7 @@ function Ball:load(window, world, radius)
     self.fixture:setRestitution(0.5)
     self.fixture:setFriction(0.1)
     self.fixture:setUserData({name = "Ball"})
-    self.body:setMass(0.5)
+    self.body:setMass(1)
 
     -- Create a line shape for rotation visualization (glm-4.7)
     local name = "BallLine"
