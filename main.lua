@@ -10,7 +10,7 @@ local Front = require("player.front")
 local ContactHandler = require("core.contact")
 
 function love.conf(t)
-    t.console = true09
+    t.console = true
 end
 
 local window = {}
