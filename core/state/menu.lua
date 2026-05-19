@@ -1,5 +1,9 @@
 local Joystick = require("core.input.joystick")
 local Keyboard = require("core.input.keyboard")
+local MenuShader = require("agent.copilot.menushader")
+local resumeImage = love.graphics.newImage("images/MenuResume-01.png", { dpiscale = 5 })
+local pausedImage = love.graphics.newImage("images/MenuWamBam.png", { dpiscale = 5 })
+
 
 -- Partial Definition for States
 local states = {
@@ -26,6 +30,9 @@ states.landing.nodes = { states.game, states.exit }
 states.game.nodes = { states.paused }
 states.paused.nodes = { states.game, states.landing, states.exit }
 
+states.landing.images = { pausedImage, pausedImage }
+states.game.images = { pausedImage }
+states.paused.images = { resumeImage, pausedImage, pausedImage }
 -- Define States 'contents'
 states.landing.title = "Landing"
 states.landing.text = { "Start New Game", "Exit" }
@@ -146,7 +153,7 @@ local StateMachine = {
 
 local isLoaded = false
 
-function StateMachine:load( )
+function StateMachine:load()
     print("inside load")
     print(self.state.title)
     if self.state ~= nil then
@@ -161,6 +168,7 @@ function StateMachine:load( )
         print("\n")
         -- self.state = state
     end
+    MenuShader.load()
 end
 
 function StateMachine:next()
@@ -173,23 +181,18 @@ function StateMachine:next()
 end
 
 function StateMachine:update(dt)
-    local last = JoystickInput.lastButton
-    -- if last ~= "none" then
-    --     print(JoystickInput.lastButton)
-    -- end
     for k, node in ipairs(self.state.nodes) do
         -- check onTest for each reachable state
-        -- print("checking tests for node: ")
-        -- print(node.title)
+
         for k1, nodeTest in pairs(self.state.trigger.onTest) do
             local res = nodeTest()
             if res > 0 then
-                print("made it " .. res)
                 JoystickInput:setLastButton("none")
                 self.state.trigger.onEnter[res]()
                 self.state = self.state.nodes[res]
                 self:load()
-                return self.state.title ~= "Paused" and self.state.title ~= "Landing" -- should a value here represent whether physics runs in main
+                return self.state.title ~= "Paused" and
+                self.state.title ~= "Landing"                                         -- should a value here represent whether physics runs in main
             end
         end
     end
@@ -197,16 +200,15 @@ function StateMachine:update(dt)
 end
 
 function StateMachine:draw(window)
-    -- print("current state: ")
-    -- print(self.state.title)
-    local font = love.graphics.getFont()
-    local text = love.graphics.newText(font, nil)
+    local image = nil
     local width = 0
-    local height = font:getHeight()
     love.graphics.setColor(1, 1, 1, 1)
-    width = text:add({ { 1, 1, 1 }, self.state.title }, 0, 0) + width
-    width = text:add({ { 0.8, 0.8, 0 }, "\nSecond Option" }, 0, 0) + width
-    love.graphics.draw(text, window.right / 2 - width / 2, 99)
+    for i = 1, #self.state.images do
+        image = self.state.images[i]
+        MenuShader:draw(image, window.right / 2 - width / 2, 99 + 50 * i, false)
+        -- love.graphics.draw(image, window.right / 2 - width / 2, 99 + 50 * i)
+    end
+
 end
 
 return StateMachine

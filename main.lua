@@ -89,11 +89,11 @@ function love.update(dt)
     -- update ball
     Ball:update(dt)
 
-    -- joystick input (up to date)
-    JoystickInput:update(dt)
     
     Rear:update(dt)
     Front:update(dt)
+    -- joystick input (up to date)
+    JoystickInput:update(dt)
     KeyboardInput:update(dt)
 end
 
