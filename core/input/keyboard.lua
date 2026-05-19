@@ -1,11 +1,12 @@
-local KeyboardInput = {}
+local KeyboardInput = {
+    lastKey = "none"
+}
 
-local lastKey = "none"
 
 
 function love.keypressed(key, scancode, isrepeat)
     if not isrepeat then
-        lastKey = key
+        KeyboardInput.lastKey = key
     end
 end
 
