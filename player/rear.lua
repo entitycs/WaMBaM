@@ -1,9 +1,22 @@
 local Rear = {}
 local RotVis = require("agent.glm.rotvis")
 local RearRotVis = nil
+
+
 function Rear:drop(x_pos, y_pos)
     self.x = math.abs(x_pos)
     self.y = math.abs(y_pos)
+end
+
+
+function Rear:applyBraking(inputValue)
+
+end
+
+
+function Rear:releaseBraking()
+    self.body:setAngularDamping(100)
+    self.body:setLinearDamping(1)
 end
 
 function Rear:load(window, world, size)
@@ -18,7 +31,7 @@ function Rear:load(window, world, size)
     self.fixture:setUserData({name = "Rear"})
     self.body:setMass(6)
     self.body:setGravityScale(2)
-    self.body:setAngularDamping(100)
+    self:releaseBraking()
     local dimmer = 1.0
     self.force = self.body:getMass() * 175 * dimmer
     RearRotVis = RotVis:new(self.size, self.body, "RearRotation")

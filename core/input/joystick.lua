@@ -39,17 +39,14 @@ function JoystickInput:update(dt)
         if triggerval ~= 0 then
             currentAngle.x, currentAngle.y = self.rear.body:getLinearVelocity()
             currentAngle.changed = true
-            self.front.body:setLinearDamping(25 * triggerval + 0.5)
-            self.front.body:setAngularDamping(25 * triggerval + 0.5)
-            local curx, cury = self.front.body:getLinearVelocity()
-            -- front.body:setLinearVelocity(curx * (1 - triggerval) , cury * (1 - triggerval))
+            self.front:applyBraking(triggerval)
         elseif currentAngle.changed then
             local newx, newy = self.rear.body:getLinearVelocity()
             local newx2, newy2 = self.front.body:getLinearVelocity()
             self.rear.body:setLinearVelocity((newx + newx2) / 2, (newy + newy2) / 2)
             self.front.body:setLinearVelocity((newx + newx2) / 2, (newy + newy2) / 2)
-            self.front.body:setLinearDamping(0.25)
-            self.rear.body:setLinearDamping(0.5)
+            -- self.front.body:setLinearDamping(0.25)
+            -- self.rear.body:setLinearDamping(0.5)
             currentAngle.changed = false
         end
 
