@@ -6,7 +6,7 @@ function MenuShader.load()
 end
 
 function MenuShader:apply(selected)
-    if selected then
+    if not selected then
         -- self.shader:send("scaleFactor", 0.9)
         self.shader:send("desatAmount", 0.8)
         love.graphics.setShader(self.shader)
@@ -20,7 +20,7 @@ end
 function MenuShader:draw(image, x, y, selected)
     love.graphics.push()
     love.graphics.translate(x, y)
-    self:apply(not selected)
+    self:apply(selected)
     love.graphics.draw(image, 0, 0)
     love.graphics.pop()
     love.graphics.setShader()
