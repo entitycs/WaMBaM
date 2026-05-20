@@ -209,6 +209,7 @@ end
 
 function StateMachine:update(dt)
 
+    -- selection up/down (joystick only -- keyboard todo)
     if joystick.lastButton == "dpdown" then
         cursorNext(self.state.nodes)
         joystick.lastButton = "none"
@@ -222,7 +223,7 @@ function StateMachine:update(dt)
         else node.selected = false
        end
 
-        -- check for selection with cursor
+        -- check for selection trigger aligned with cursor
         if joystick.lastButton == "a" then
             if node.selected then
                 joystick.lastButton = "none"
@@ -249,18 +250,11 @@ end
 
 function StateMachine:draw(window)
     local image = nil
-    local width = 0
     love.graphics.setColor(1, 1, 1, 1)
     if self.state.images then
         for i = 1, #self.state.images do
             image = self.state.images[i]
-            local designDPI = 72
-            local displayDPI = love.window.getDPIScale() * 96  -- LÖVE’s scale factor × baseline DPI
-            local scale = displayDPI / designDPI
-
-            local height = image:getHeight() / scale
-
-            menuShader:draw(image, window.right / 2 - width / 2, 20 + 100   * i, self.state.nodes[i].selected)
+            menuShader:draw(image, window.right / 2 , 20 + 100   * i, self.state.nodes[i].selected)
         end
     end
 end
