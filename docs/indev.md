@@ -70,9 +70,8 @@ Maximum # of options available when paused. Exit state has onTest defined as no-
 > states.paused.nodes = { states.game, states.landing, states.exit }
 >
 > -- on up/down arrows
-> cursor = cursor + 1
-> cursor = cursor - 1
-> if cursor < 1 or cursor > #state.nodes then cursor = 1 end
+> cursor = cursor + 1 -- wraps to 1
+> cursor = cursor - 1 -- wraps to #state.nodes
 >
 > -- on enter / a keys
 > self.state = state.nodes[cursor]
@@ -89,7 +88,7 @@ sequenceDiagram
     StateMachine->>Draw: Display reachable options
     StateMachine->>Update: Test state triggers  
     StateMachine->>Update: Run any triggered onEnter method(s)
-    StateMachine->>Load: Load new state based on onTest results Else if `res = 0`, do not low into a new state.
+    StateMachine->>Load: Load new state based on onTest results Else if `res = 0`, do not load into a new state.
  
   
 ```
