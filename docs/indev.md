@@ -51,6 +51,35 @@ classDef End fill:#f28,color:#efe
 
 Maximum # of options available when paused. Exit state has onTest defined as no-op, as there are no further states reachable. Hence `nodes = {}`, `text = {}`, `onTest = {}`. Only title and `onEnter` are defined.
 
+>
+> ```mermaid
+> flowchart LR
+> Landing --> Game & Exit
+> Game --> Paused
+> Paused --> Exit & Landing & Game
+> Cursor ..->|"1st in iPairs(nodes)"| Landing & Game
+> Cursor ..->|1st but unnecessary| Paused
+> 
+> ```
+>
+> ```lua
+> -- Define States 'graph'
+> cursor = 1 -- every time we load a new state
+> states.landing.nodes = { states.game, states.exit }
+> states.game.nodes = { states.paused }
+> states.paused.nodes = { states.game, states.landing, states.exit }
+>
+> -- on up/down arrows
+> cursor = cursor + 1
+> cursor = cursor - 1
+> if cursor < 1 or cursor > #state.nodes then cursor = 1 end
+>
+> -- on enter / a keys
+> self.state = state.nodes[cursor]
+> -- load (triggers state.triggers.onEnter)
+> self:load()
+> ```
+
 ```mermaid
 sequenceDiagram
     autonumber
