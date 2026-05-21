@@ -3,7 +3,6 @@ local KeyboardInput = {
 }
 
 
-
 function love.keypressed(key, scancode, isrepeat)
     if not isrepeat then
         KeyboardInput.lastKey = key

@@ -2,11 +2,13 @@ require("core.ratios")
 require("current.arena")
 local Menu = require("core.state.menu")
 Arena = require("core.arena")
-JoystickInput = require("core.input.joystick")
-KeyboardInput = require("core.input.keyboard")
+-- JoystickInput = require("core.input.joystick")
+-- KeyboardInput = require("core.input.keyboard")
 local Ball = require("core.ball")
-local Rear = require("player.rear")
-local Front = require("player.front")
+local PlayerProto = require("player.body")
+local Player1 = {}
+local Player2 = {}
+
 local ContactHandler = require("core.contact")
 
 function love.conf(t)
@@ -22,7 +24,7 @@ end
 
 local center = {} -- connector
 
-local limitingVel = 400
+-- local limitingVel = 400
 function love.load()
     love.physics.setMeter(64)
     window.left = 0
@@ -50,23 +52,12 @@ function love.load()
     local ballRadius = BallSize(wheelSize)
     Ball:load(window, world, ballRadius)
 
-    -- Player
-    -- - Rear 'Wheel'
-    Rear:load(window, world, wheelSize)
-    -- - Front 'Wheel'
-    Front:load(window, world, Rear, contactHandler)
+    -- Players
+    Player1 = PlayerProto.new()
+    Player2 = PlayerProto.new()
 
-    -- 'Center/Body' (no collision)
-    center.joint = love.physics.newDistanceJoint(
-        Rear.body, Front.body,
-        Rear.body:getX(), Front.body:getY(),
-        Front.body:getX(), Front.body:getY(),
-        false -- do not collide with each other
-    )
-
-    KeyboardInput:load(Rear, Front, limitingVel)
-    JoystickInput:load(Rear, Front, limitingVel)
-
+    Player2:load(window, world, wheelSize, contactHandler)
+    Player1:load(window, world, wheelSize, contactHandler)
     -- Arena
     Arena:load(window, world)
 
@@ -89,12 +80,8 @@ function love.update(dt)
     -- update ball
     Ball:update(dt)
 
-    
-    Rear:update(dt)
-    Front:update(dt)
-    -- joystick input (up to date)
-    JoystickInput:update(dt)
-    KeyboardInput:update(dt)
+    Player1:update(dt)
+    Player2:update(dt)
 end
 
 function love.draw()
@@ -107,28 +94,14 @@ function love.draw()
 
     -- Draw Arena
     Arena:draw()
-    local curVel_x, curVel_y = Rear.body:getLinearVelocity()
-    local angVel = Rear.body:getAngularVelocity()
-    love.graphics.print("LinearVelocity: " .. curVel_x + curVel_y, 200, 120)
-    love.graphics.print("AngularVelocity: " .. angVel, 200, 140)
 
-    -- Draw rear wheel
-    Rear:draw()
-    -- Draw Front Wheel
-    Front:draw()
-    -- Draw the line between them
-    love.graphics.setColor(1, 1, 0.4)
-    love.graphics.setLineWidth(3)
-    love.graphics.line(
-        Rear.body:getX(), Rear.body:getY(),
-        Front.body:getX(), Front.body:getY()
-    )
-
+    -- Draw player
+    Player1:draw()
+    Player2:draw()
     -- Draw ball
     Ball:draw()
 
-    -- Draw joystick (ie. debugging)
-    JoystickInput:draw()
+    -- Draw Menu
     Menu:draw(window)
 
 end

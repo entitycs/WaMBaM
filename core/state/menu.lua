@@ -1,4 +1,4 @@
-local joystick = require("core.input.joystick")
+local JoystickInputProto = require("core.input.joystick")
 local keyboard = require("core.input.keyboard")
 local menuShader = require("agent.copilot.menushader")
 local resumeImage = love.graphics.newImage("images/MenuResume-02.png", { dpiscale = 7 })
@@ -7,6 +7,7 @@ local exitImage = love.graphics.newImage("images/MenuExit-CP.png", { dpiscale = 
 local mainMenuImage = love.graphics.newImage("images/MenuMain-CP.png", { dpiscale = 5 })
 
 local cursor = 1
+local joystick = {}
 
 local function cursorNext(nodes)
     cursor = cursor + 1
@@ -27,8 +28,9 @@ local function cursorReset()
 end
 
 local function checkConsumeJoy(state)
-    if joystick.lastButton == state.joyMap then
-        joystick.lastButton = "none"
+    -- if joystick.lastButton == state.joyMap then
+    --     joystick.lastButton = "none"
+    if JoystickInputProto.consumeButton(state.joyMap) then
         return true
     end
     return false
@@ -159,10 +161,7 @@ states.paused.trigger = {
 
 states.exit.trigger = {
     onTest = { function() -- todo: if confirm-exit step
-        if joystick.lastButton == "x" then
-            return 1
-        end
-        if keyboard.lastKey == "escape" then
+        if checkConsumeInput(states.exit) then
             return 1
         end
         return 0
@@ -180,6 +179,7 @@ local isLoaded = false
 
 function StateMachine:load()
     print("inside load")
+    joystick = JoystickInputProto.new()
     cursorReset()
     print(self.state.title)
     if self.state ~= nil then
@@ -210,12 +210,10 @@ end
 function StateMachine:update(dt)
 
     -- selection up/down (joystick only -- keyboard todo)
-    if joystick.lastButton == "dpdown" then
+    if JoystickInputProto.consumeButton("dpdown") then
         cursorNext(self.state.nodes)
-        joystick.lastButton = "none"
-    elseif joystick.lastButton == "dpup" then
+    elseif JoystickInputProto.consumeButton("dpup") then
         cursorPrev(self.state.nodes)
-        joystick.lastButton = "none"
     end
 
     for k, node in ipairs(self.state.nodes) do
@@ -224,9 +222,8 @@ function StateMachine:update(dt)
        end
 
         -- check for selection trigger aligned with cursor
-        if joystick.lastButton == "a" then
+        if JoystickInputProto.consumeButton("a") then
             if node.selected then
-                joystick.lastButton = "none"
                 self.state = node
                 self:load()
             end
@@ -237,7 +234,7 @@ function StateMachine:update(dt)
             local res = nodeTest()
             if res > 0 then
                 -- 'consume' the button input
-                JoystickInput:setLastButton("none")
+                -- JoystickInput:setLastButton("none")
                 self.state = self.state.nodes[res]
                 self:load()
                 return self.state.title ~= states.paused.title and

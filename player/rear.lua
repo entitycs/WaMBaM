@@ -1,6 +1,16 @@
 local Rear = {}
+Rear.__index = Rear
+
 local RotVis = require("agent.glm.rotvis")
-local RearRotVis = nil
+
+
+function Rear.new()
+    local self = setmetatable({
+        rotVis = nil
+    }, Rear)
+
+    return self
+end
 
 
 function Rear:drop(x_pos, y_pos)
@@ -34,7 +44,7 @@ function Rear:load(window, world, size)
     self:releaseBraking()
     local dimmer = 1.0
     self.force = self.body:getMass() * 175 * dimmer
-    RearRotVis = RotVis:new(self.size, self.body, "RearRotation")
+    self.rotVis = RotVis:new(self.size, self.body, "RearRotation")
 end
 
 function Rear:update(dt)
@@ -49,7 +59,7 @@ function Rear:draw()
         self.shape:getRadius()
     )
     love.graphics.setColor(0, 0, 0)
-    if RearRotVis ~= nil then RearRotVis:draw() end
+    if self.rotVis ~= nil then self.rotVis:draw() end
     love.graphics.setColor(1, 1, 1)
 end
 

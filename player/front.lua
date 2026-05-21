@@ -1,9 +1,19 @@
 local Front = {}
+Front.__index = Front
 
 local Shockwave = require("agent.copilot.shockwave")
 local RotVis = require("agent.glm.rotvis")
-local FrontRotVis = nil
-local effects = {}
+
+function Front.new()
+    local self = setmetatable({
+
+        effects = {},
+        rotVis = nil
+    }, Front)
+
+
+    return self
+end
 
 function Front:collisionOnEnter(fixture_a, fixture_b, contact)
     -- Handle collisions between 'Front' and 'Ball'
@@ -11,7 +21,7 @@ function Front:collisionOnEnter(fixture_a, fixture_b, contact)
     for i = 1, #point, 2 do
         local x, y = point[i], point[i + 1]
         -- Cache the values inside the (volatile) Contacts (fron love docs)
-        table.insert(effects, Shockwave.new(x, y))
+        table.insert(self.effects, Shockwave.new(x, y))
     end
     -- do not use contact after this function returns
 end
@@ -41,7 +51,7 @@ function Front:load(window, world, rear, contactHandler)
     self:releaseBraking()
     -- rotation visualization
     local name = "FrontLine"
-    FrontRotVis = RotVis:new(self.size, self.body, name)
+    self.rotVis = RotVis:new(self.size, self.body, name)
      
     -- contact visualization
     contactHandler:addBegin("Front", "Ball", function(a, b, contact)
@@ -52,11 +62,11 @@ end
 
 function Front:update(dt, window, world)
     self:releaseBraking()
-    for i = #effects, 1, -1 do
-        local e = effects[i]
+    for i = #self.effects, 1, -1 do
+        local e = self.effects[i]
         e:update(dt)
         if e.dead then
-            table.remove(effects, i)
+            table.remove(self.effects, i)
         end
     end
 end
@@ -71,11 +81,11 @@ function Front:draw()
 
     -- draw line showing rotation
     love.graphics.setColor(0, 0, 0)
-    if FrontRotVis ~= nil then FrontRotVis:draw() end
+    if self.rotVis ~= nil then self.rotVis:draw() end
 
     love.graphics.setColor(1, 1, 1)
     -- Draw Particle Effects
-    for _, e in pairs(effects) do
+    for _, e in pairs(self.effects) do
         e:draw()
     end
 
