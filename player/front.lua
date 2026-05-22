@@ -37,7 +37,7 @@ function Front:releaseBraking()
     -- self.body:setLinearDamping(1)
 end
 
-function Front:load(window, world, rear, contactHandler)
+function Front:load(window, world, rear, contactHandler, playerCount)
     self.size = rear.size
     self.torque = FrontWheelTorque(rear.force) --175 * dimmer
     self.body = love.physics.newBody(world, rear.x + self.size * 6, rear.y, "dynamic")
@@ -45,7 +45,7 @@ function Front:load(window, world, rear, contactHandler)
     self.fixture = love.physics.newFixture(self.body, self.shape, 1)
     self.fixture:setRestitution(0.85)
     self.fixture:setFriction(0.0)
-    self.fixture:setUserData({ name = "Front" })
+    self.fixture:setUserData({ name = "Front"..playerCount })
     self.body:setMass(FrontWheelMass(rear.body:getMass()))
     self.body:setGravityScale(FrontWheelGravityScale(rear.body:getGravityScale()))
     self:releaseBraking()
@@ -54,7 +54,7 @@ function Front:load(window, world, rear, contactHandler)
     self.rotVis = RotVis:new(self.size, self.body, name)
      
     -- contact visualization
-    contactHandler:addBegin("Front", "Ball", function(a, b, contact)
+    contactHandler:addBegin("Front"..playerCount, "Ball", function(a, b, contact)
         return self:collisionOnEnter(a, b, contact)
     end)
 

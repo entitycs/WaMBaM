@@ -29,7 +29,7 @@ function Rear:releaseBraking()
     self.body:setLinearDamping(1)
 end
 
-function Rear:load(window, world, size)
+function Rear:load(window, world, size, playerCount)
     self.x = 100
     self.y = 0
     self.size = size
@@ -38,7 +38,7 @@ function Rear:load(window, world, size)
     self.fixture = love.physics.newFixture(self.body, self.shape, 1)
     self.fixture:setRestitution(0.01)
     self.fixture:setFriction(1)
-    self.fixture:setUserData({name = "Rear"})
+    self.fixture:setUserData({name = "Rear"..playerCount})
     self.body:setMass(6)
     self.body:setGravityScale(2)
     self:releaseBraking()

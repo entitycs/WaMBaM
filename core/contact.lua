@@ -14,6 +14,10 @@ end
 ---@param nameFixtureB string
 ---@param handler function
 function ContactHandler:addBegin(nameFixtureA, nameFixtureB, handler)
+    print("contact handler: ")
+    print("nameFixtureA: ", nameFixtureA)
+    print("nameFixtureB: ", nameFixtureB)
+
     table.insert(self.handlers.begin, { names = { nameFixtureA, nameFixtureB }, handler = handler })
 end
 

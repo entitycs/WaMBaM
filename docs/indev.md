@@ -194,7 +194,6 @@ function StateMachine:update(dt)
             local res = nodeTest()
             if res > 0 then
                 -- 'consume' the button input
-                JoystickInput:setLastButton("none")
                 self.state = self.state.nodes[res]
                 self:load()
                 return self.state.title ~= states.paused.title and

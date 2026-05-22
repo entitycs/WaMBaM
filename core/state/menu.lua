@@ -119,7 +119,7 @@ states.landing.trigger = {
 
 states.game.trigger = {
     onTest = { function()
-        if checkConsumeInput(states.paused) then 
+        if checkConsumeInput(states.paused) then
             return 1
         end
         return 0
@@ -154,7 +154,7 @@ states.paused.trigger = {
         end
     },
     onEnter = function()
-        -- 
+        --
         print("GAME PAUSED!!!")
     end
 }
@@ -179,20 +179,22 @@ local isLoaded = false
 
 function StateMachine:load()
     print("inside load")
-    joystick = JoystickInputProto.new()
+    if not joystick then
+        joystick = JoystickInputProto.new()
+    end
     cursorReset()
     print(self.state.title)
     if self.state ~= nil then
         self.state.trigger.onEnter()
-        print("new states available:")
-        for k in ipairs(self.state.nodes) do
-            print(k .. "...")
-            for k1, v in pairs(self.state.nodes[k]) do
-                print(k1)
-                print(v)
-            end
-        end
-        print("\n")
+        -- print("new states available:")
+        -- for k in ipairs(self.state.nodes) do
+        --     print(k .. "...")
+        --     for k1, v in pairs(self.state.nodes[k]) do
+        --         print(k1)
+        --         print(v)
+        --     end
+        -- end
+        -- print("\n")
         -- self.state = state
     end
     menuShader.load()
@@ -208,7 +210,6 @@ function StateMachine:next()
 end
 
 function StateMachine:update(dt)
-
     -- selection up/down (joystick only -- keyboard todo)
     if JoystickInputProto.consumeButton("dpdown") then
         cursorNext(self.state.nodes)
@@ -216,17 +217,13 @@ function StateMachine:update(dt)
         cursorPrev(self.state.nodes)
     end
 
+    local currentSelection = nil
     for k, node in ipairs(self.state.nodes) do
-        if cursor == k then node.selected = true
-        else node.selected = false
-       end
-
-        -- check for selection trigger aligned with cursor
-        if JoystickInputProto.consumeButton("a") then
-            if node.selected then
-                self.state = node
-                self:load()
-            end
+        if cursor == k then
+            node.selected = true
+            currentSelection = node
+        else
+            node.selected = false
         end
 
         -- check onTest for each reachable state
@@ -238,8 +235,20 @@ function StateMachine:update(dt)
                 self.state = self.state.nodes[res]
                 self:load()
                 return self.state.title ~= states.paused.title and
-                self.state.title ~= states.landing.title                                     -- should a value here represent whether physics runs in main
+                    self.state.title ~=
+                    states.landing
+                    .title                           -- should a value here represent whether physics runs in main
             end
+        end
+    end
+    -- check for selection trigger aligned with cursor
+    if JoystickInputProto.consumeButton("a") then
+        if currentSelection then
+            print("a pressed")
+            print(currentSelection.title)
+            print(currentSelection.selected)
+            self.state = currentSelection
+            self:load()
         end
     end
     return self.state.title == states.game.title
@@ -251,7 +260,7 @@ function StateMachine:draw(window)
     if self.state.images then
         for i = 1, #self.state.images do
             image = self.state.images[i]
-            menuShader:draw(image, window.right / 2 , 20 + 100   * i, self.state.nodes[i].selected)
+            menuShader:draw(image, window.right / 2, 20 + 100 * i, self.state.nodes[i].selected)
         end
     end
 end
