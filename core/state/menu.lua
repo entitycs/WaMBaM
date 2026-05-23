@@ -8,6 +8,7 @@ local mainMenuImage = love.graphics.newImage("images/MenuMain-CP.png", { dpiscal
 
 local cursor = 1
 local joystick = {}
+local previousState = {}
 
 local function cursorNext(nodes)
     cursor = cursor + 1
@@ -85,29 +86,39 @@ local states = {
         keyMap = "q",
         selected = false,
         nodes = {}
+    },
+    confirmExit = {
+        title = "confirm exit",
+        joyMap = "x",
+        keyMap = "q",
+        selected = false,
+        nodes = {}
     }
 }
 
 -- Define States 'graph'
-states.landing.nodes = { states.game, states.exit } -- future home of settings?
+states.landing.nodes = { states.game, states.confirmExit } -- future home of settings?
 states.game.nodes = { states.paused }
-states.paused.nodes = { states.game, states.landing, states.exit }
+states.paused.nodes = { states.game, states.landing, states.confirmExit }
+states.confirmExit.nodes = { states.exit }
 
 -- Define States 'contents'
 states.landing.images = { pausedImage, exitImage }
 states.game.images = { pausedImage }
 states.paused.images = { resumeImage, mainMenuImage, exitImage }
+states.confirmExit.images = {exitImage, pausedImage}
 
 states.landing.text = { "Start New Game", "Exit" }
 states.game.text = { "Press Start/Esc to pause" }
 states.paused.text = { "Resume", "Exit to Menu", "Exit Game" }
+states.confirmExit.text = {"Yes", "No"}
 
 states.landing.trigger = {
     onTest = { function()
         if checkConsumeInput(states.game) then
             return 1
         end
-        if checkConsumeInput(states.exit) then
+        if checkConsumeInput(states.confirmExit) then
             return 2
         end
         return 0
@@ -147,7 +158,7 @@ states.paused.trigger = {
         end,
         -- quit game
         function()
-            if checkConsumeInput(states.exit) then
+            if checkConsumeInput(states.confirmExit) then
                 return 3
             end
             return 0
@@ -156,6 +167,19 @@ states.paused.trigger = {
     onEnter = function()
         --
         print("GAME PAUSED!!!")
+    end
+}
+
+states.confirmExit.trigger = {
+    onTest = { function()
+        if checkConsumeInput(states.exit) then
+            return 1
+        end
+        return 2
+    end },
+    onEnter = function()
+        print("CONFIRM EXIT") -- todo: show RUSure? graphic
+        states.confirmExit.nodes[2] = previousState
     end
 }
 
@@ -185,7 +209,8 @@ function StateMachine:load()
     cursorReset()
     print(self.state.title)
     if self.state ~= nil then
-        self.state.trigger.onEnter()
+        self.state.trigger.onEnter(previousState)
+        previousState = self.state
         -- print("new states available:")
         -- for k in ipairs(self.state.nodes) do
         --     print(k .. "...")

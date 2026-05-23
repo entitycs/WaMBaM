@@ -39,16 +39,26 @@ function ContactHandler.new(world)
         if fixtureA == nil or fixtureB == nil then return end
         local ud_a = fixtureA:getUserData() or nil
         local ud_b = fixtureB:getUserData() or nil
-        if ud_a ~= nil then
-            for k, v in pairs(ud_a) do
-                print(k, v)
-            end
-        end
-        if ud_b ~= nil then
-            for k, v in pairs(ud_b) do
-                print(k, v)
-            end
-        end
+        -- local i = 0
+        -- if ud_a ~= nil then
+        --     for k, v in pairs(ud_a) do
+        --         io.write(string.format("key: %s, value: %s\n", k, v))
+        --         i = i + 1
+        --         if i % 2 == 0 then
+        --             io.write(string.format("\n"))
+        --         end
+        --     end
+        -- end
+        -- i = 0
+        -- if ud_b ~= nil then
+        --     for k, v in pairs(ud_b) do
+        --         io.write(string.format("key: %s, value: %s\n", k, v))
+        --         i = i + 1
+        --         if i % 2 == 0 then
+        --             io.write(string.format("\n"))
+        --         end
+        --     end
+        -- end
         -- Handle collisions between eg. 'Front' and 'Ball'
         for i, o in pairs(handlers.begin) do
             -- copy fixture names for handler

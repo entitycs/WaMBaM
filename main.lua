@@ -2,8 +2,6 @@ require("core.ratios")
 require("current.arena")
 local Menu = require("core.state.menu")
 Arena = require("core.arena")
--- JoystickInput = require("core.input.joystick")
--- KeyboardInput = require("core.input.keyboard")
 local Ball = require("core.ball")
 local PlayerProto = require("player.body")
 local Player1 = {}
@@ -20,6 +18,7 @@ local world
 
 local function reloadBall(fixtureA, fixtureB, contact)
     Ball:drop(window.right / 2 - Ball.shape:getRadius() / 2, 30)
+    love.audio.play(love.audio.newSource("audio/score.wav", "static"))
 end
 
 local center = {} -- connector

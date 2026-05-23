@@ -2,6 +2,7 @@ local JoystickInputProto = require("core.input.joystick")
 local KeyboardInput = require("core.input.keyboard")
 local RearProto = require("player.rear")
 local FrontProto = require("player.front")
+local AudioProto = require("core.audio")
 
 local playerCount = 1
 
@@ -20,19 +21,19 @@ local inputMap = {
 
 
 function Player.new()
- 
     -- local JoyInput = JoystickInputProto.new()
     local self = setmetatable({
         id = playerCount,
         joystickInput = nil,
-        front = FrontProto.new() ,
-        rear = RearProto.new(),
+        front = FrontProto.new(),
+        rear = RearProto.new(), 
+        audio = AudioProto.new(),
         currentState = {
             x = 0,
             y = 0,
-            forceValue = {x = 0, y = 0},
+            forceValue = { x = 0, y = 0 },
             boostValue = 0,
-            torqueValue = {x = 0, y = 0},
+            torqueValue = { x = 0, y = 0 },
             brakeReleasedThisFrame = false,
         }
     }, Player)
@@ -40,7 +41,6 @@ function Player.new()
     playerCount = playerCount + 1
     return self
 end
-
 
 function Player:load(window, world, wheelSize, contactHandler)
     -- load body parts
@@ -55,14 +55,18 @@ function Player:load(window, world, wheelSize, contactHandler)
     )
     -- load body inputs
     KeyboardInput:load(self.rear, self.front, limitingVel)
-    self.joystickInput = JoystickInputProto.new({self}) -- todo make a bodyForceHandler?
+    self.joystickInput = JoystickInputProto.new({ self })   -- todo make a bodyForceHandler?
     self.joystickInput:load(self.rear, self.front, limitingVel)
     -- todo, pass playercount, then attempt fallback controller if > available controllers/inputs
-    -- ?
-    -- self.currentState = { x = 0, y = 0, brakeReleasedThisFrame = false }
+    self.audio:load({ wam = "audio/wam.wav", bam = "audio/bam.wav", score = "audio/score.wav" })
+    contactHandler:addBegin("Front" .. self.id, "Ball", function(a, b, contact)
+        return self:collisionOnEnter("bam", b, contact)
+    end)
+    contactHandler:addBegin("Rear" .. self.id, "Ball", function(a, b, contact)
+        return self:collisionOnEnter("wam", b, contact)
+    end)
     playerCount = playerCount + 1
 end
-
 
 function Player:update(dt)
     -- if self.currentState.forceValue == nil then return end
@@ -70,10 +74,10 @@ function Player:update(dt)
     self.front:update(dt)
     self.joystickInput:update(dt)
     KeyboardInput:update(dt)
-    
+
     self.rear.body:applyLinearImpulse(
-       dt * self.currentState.forceValue.x,
-      dt * self.currentState.forceValue.y
+        dt * self.currentState.forceValue.x,
+        dt * self.currentState.forceValue.y
     )
 
     self.front.body:applyLinearImpulse(
@@ -81,21 +85,19 @@ function Player:update(dt)
         dt * self.currentState.torqueValue.y
     )
 
-    -- self.rear.body:applyLinearImpulse(0, -0.65 * self.currentState.torqueValue.y)
 
 
     -- for k, v in pairs(self.currentState) do
     --     print(k .. ": ", "")
-    --     if type(v) == "table" then print( v.x ); print(v.y) 
+    --     if type(v) == "table" then print( v.x ); print(v.y)
     --     else print(v)
     --     end
     -- end
     self.currentState.boostValue = 0
-    self.currentState.forceValue = {x = 0, y = 0}
+    self.currentState.forceValue = { x = 0, y = 0 }
     self.currentState.torqueValue = { x = 0, y = 0 }
     self.currentState.brakeValue = 0
 end
-
 
 function Player:draw()
     -- Draw rear wheel
@@ -120,6 +122,11 @@ function Player:draw()
 end
 
 
+function Player:collisionOnEnter(fixture_a, fixture_b, contact)
+   love.audio.play(self.audio[fixture_a])
+end
+
+
 function Player:onTrigger(triggerName, triggerValue)
     if triggerName == inputMap.braking then
         self:applyBraking(triggerValue)
@@ -132,21 +139,21 @@ function Player:onTriggerRelease(triggerName)
 
 end
 
-
 function Player:onAxis(axisName, axisValue)
     -- if axisName == inputMap.forceX or axisName == inputMap.forceY then
-        self:applyAcceleration(axisName, axisValue)
+    self:applyAcceleration(axisName, axisValue)
     -- end
 end
 
-
 function Player:applyBraking(brakeValue)
-    if brakeValue ~= 0 then -- onTrigger(triggerright)
+    if brakeValue ~= 0 then     -- onTrigger(triggerright)
         self.currentState.x, self.currentState.y = self.rear.body:getLinearVelocity()
         self.currentState.brakeReleasedThisFrame = true
         self.front:applyBraking(brakeValue)
-    elseif self.currentState.brakeReleasedThisFrame then -- onTriggerRelease(triggerright)
+    elseif self.currentState.brakeReleasedThisFrame then     -- onTriggerRelease(triggerright)
         -- average out front and back velocities over the frame following braking
+        self.front:releaseBraking()
+        self.rear:releaseBraking()
         local newx, newy = self.rear.body:getLinearVelocity()
         local newx2, newy2 = self.front.body:getLinearVelocity()
         self.rear.body:setLinearVelocity((newx + newx2) / 2, (newy + newy2) / 2)
@@ -181,14 +188,10 @@ function Player:applyAcceleration(axisName, accelerationValue)
     self.currentState.forceValue.x = xForce
     self.currentState.forceValue.y = yForce
     --self.rear.body:applyLinearImpulse(xForce, yForce)
-
-    print(axisName)
     if axisName == inputMap.torqueY and not limitedY then
-        print("yessss")
         if self.rear.body:getX() ~= self.front.body:getX() then
             self.currentState.torqueValue.y = 1 + self.front.torque * accelerationValue
-            -- self.front.body:applyLinearImpulse(0, self.currentAngle.impulse)
-            -- self.rear.body:applyLinearImpulse(0, -.65 * self.currentAngle.impulse)
+            self.currentState.forceValue.y = self.currentState.forceValue.y - 0.65 * self.currentState.torqueValue.y
         end
     elseif axisName == inputMap.torqueX and not limitedX then
         if self.rear.body:getX() ~= self.front.body:getX() then
