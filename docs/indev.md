@@ -146,10 +146,10 @@ states.paused.text = { "Resume", "Exit to Menu", "Exit Game" }
 
 states.landing.trigger = {
     onTest = { function()
-        if checkConsumeInput(states.game) then
+        if CheckConsumeInput(states.game) then
             return 1
         end
-        if checkConsumeInput(states.exit) then
+        if CheckConsumeInput(states.exit) then
             return 2
         end
         return 0

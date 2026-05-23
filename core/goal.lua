@@ -1,16 +1,8 @@
 local centerAndScale = require("agent.copilot.centroid")
+require("core.utils.table")
 
 local Goal = {}
 Goal.__index = Goal
-
-local function contains(t, val)
-    for _, v in pairs(t) do
-        if v == val then
-            return true
-        end
-    end
-    return false
-end
 
 function Goal:new(world, ballSize, posX, posY, flip)
     local goalSize = ballSize * 1.25
@@ -46,7 +38,7 @@ function Goal:new(world, ballSize, posX, posY, flip)
     -- from copilot, get center of goal polygon
     local newPoints  = centerAndScale(points, 1.25)
     for i = 1, #newPoints, 2 do
-        if not contains(openEdges, i) then 
+        if not Contains(openEdges, i) then 
             local x1 = newPoints[i]  
             local y1 = newPoints[(i + 1)]  
             local x2 = (newPoints[(i + 2)] or newPoints[1]) 

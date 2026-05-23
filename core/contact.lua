@@ -1,13 +1,6 @@
 local ContactHandler = {}
 ContactHandler.__index = ContactHandler
-local function contains(t, val)
-    for _, v in pairs(t) do
-        if v == val then
-            return true
-        end
-    end
-    return false
-end
+
 -- Add Begin callback
 --- func desc
 ---@param nameFixtureA string
