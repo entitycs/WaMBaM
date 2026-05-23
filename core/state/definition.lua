@@ -1,8 +1,10 @@
 require("core.utils.input")
 require("agent.copilot.menuitempos")
-
+local menuShader = require("agent.copilot.menushader")
+local menuWamBam = love.graphics.newImage("images/MenuWamBam.png", { dpiscale = 3 })
+local pausedImage = love.graphics.newImage("images/MenuPaused.png", { dpiscale = 3 })
 local resumeImage = love.graphics.newImage("images/MenuResume-02.png", { dpiscale = 6 })
-local pausedImage = love.graphics.newImage("images/MenuPlay-CP.png", { dpiscale = 5 })
+local pauseImage = love.graphics.newImage("images/MenuPlay-CP.png", { dpiscale = 5 })
 local exitImage = love.graphics.newImage("images/MenuExit-CP.png", { dpiscale = 6 })
 local mainMenuImage = love.graphics.newImage("images/MenuMain-CP.png", { dpiscale = 5 })
 local confirmImage = love.graphics.newImage("images/MenuExit-CP.png", { dpiscale = 5 })
@@ -58,10 +60,15 @@ states.paused.nodes = { states.game, states.landing, states.confirmExit }
 states.confirmExit.nodes = { states.exit }
 
 -- Define States 'contents'
-states.landing.images = { pausedImage, exitImage }
-states.game.images = { pausedImage }
+states.landing.images = { pauseImage, exitImage }
+states.game.images = { pauseImage }
 states.paused.images = { resumeImage, mainMenuImage, exitImage }
-states.confirmExit.images = {yesImage, noImage}
+states.confirmExit.images = { yesImage, noImage }
+
+states.landing.drawInstruction = function() menuShader:draw(menuWamBam, 0, 200, true) end
+states.game.drawInstruction = function() end
+states.paused.drawInstruction = function() menuShader:draw(pausedImage, 0, 200, true) end
+states.confirmExit.drawInstruction = function() menuShader:draw(confirmImage, 0, 200, true) end
 
 states.landing.text = { "Start New Game", "Exit" }
 states.game.text = { "Press Start/Esc to pause" }

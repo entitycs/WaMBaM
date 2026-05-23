@@ -42,11 +42,9 @@ function StateMachine:load()
         StateMachine.state = states.landing
     end
     drawQueueInstructions = {}
-    local drawInstruction = function() menuShader:draw(confirmImage, 0, 200, true) end
+    local drawInstruction = self.state.drawInstruction --function() menuShader:draw(confirmImage, 0, 200, true) end
     if not Contains(drawQueueInstructions, drawInstruction) then
         -- queue this command for draw:
-        io.write(string.format("dpi scale: %d\n", confirmImage:getDPIScale()))
-        print(getMenuItemPos(1, states.confirmExit.images))
         table.insert(drawQueueInstructions, drawInstruction)
     end
     if not joystick then
