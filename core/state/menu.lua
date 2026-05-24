@@ -98,7 +98,7 @@ function StateMachine:update(dt)
         end
     end
     -- check for selection trigger aligned with cursor
-    if JoystickInputProto.consumeButton("a") then
+    if self.state ~= states.game and JoystickInputProto.consumeButton("a") then
         if currentSelection then
             print("a pressed")
             print(currentSelection.title)
@@ -119,7 +119,7 @@ function StateMachine:draw(window)
         for i = 1, #self.state.images do
             image = self.state.images[i]
             local x, y = getMenuItemPos(i, self.state.images)
-            io.write(string.format("x, y: %d, %d\n", x, y))
+            -- io.write(string.format("x, y: %d, %d\n", x, y))
             menuShader:draw(image, x, y, self.state.nodes[i].selected)
         end
     end
