@@ -3,8 +3,8 @@ local function getMenuItemPosition(i, images)
 
     -- DPI scales
     local gfxScale = love.graphics.getDPIScale()
-    io.write(string.format("gfxScale: %d\n", gfxScale))
-    io.write(string.format("screenW, screenH: %d, %d\n", screenW, screenH))
+    -- io.write(string.format("gfxScale: %d\n", gfxScale))
+    -- io.write(string.format("screenW, screenH: %d, %d\n", screenW, screenH))
     -- Layout constants (logical units)
     local spacing      = 200 * gfxScale
     local bottomMargin = 90 * gfxScale
@@ -14,8 +14,8 @@ local function getMenuItemPosition(i, images)
     for n = 1, i-1 do
         local img = images[n]
         local s   =1 / img:getDPIScale()
-        print("dpi scale << >>")
-        print(s)
+        -- print("dpi scale << >>")
+        -- print(s)
         x = x + img:getWidth() * s + spacing
     end
 
