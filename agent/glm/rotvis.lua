@@ -1,6 +1,6 @@
 local RotVis = {}
 RotVis.__index = RotVis
-function RotVis:new(size, parentBody, name)
+function RotVis.new(size, parentBody, name)
 
     return setmetatable({
         size = size,

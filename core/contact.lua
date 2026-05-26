@@ -3,15 +3,15 @@ ContactHandler.__index = ContactHandler
 
 -- Add Begin callback
 --- func desc
----@param nameFixtureA string
----@param nameFixtureB string
----@param handler function
-function ContactHandler:addBegin(nameFixtureA, nameFixtureB, handler)
-    print("contact handler: ")
-    print("nameFixtureA: ", nameFixtureA)
-    print("nameFixtureB: ", nameFixtureB)
+---@param handler table 
+function ContactHandler:addBegin( handler)
+    -- print("contact handler: ")
+    -- print("nameFixtureA: ", nameFixtureA)
+    -- print("nameFixtureB: ", nameFixtureB)
 
-    table.insert(self.handlers.begin, { names = { nameFixtureA, nameFixtureB }, handler = handler })
+    table.insert(self.handlers.begin, { handler = handler })
+    -- handler.names? - i only use names for the test...
+    -- ... so just handler, if i refactor
 end
 
 -- Remove Begin callback
@@ -32,42 +32,30 @@ function ContactHandler.new(world)
         if fixtureA == nil or fixtureB == nil then return end
         local ud_a = fixtureA:getUserData() or nil
         local ud_b = fixtureB:getUserData() or nil
-        -- local i = 0
-        -- if ud_a ~= nil then
-        --     for k, v in pairs(ud_a) do
-        --         io.write(string.format("key: %s, value: %s\n", k, v))
-        --         i = i + 1
-        --         if i % 2 == 0 then
-        --             io.write(string.format("\n"))
-        --         end
-        --     end
-        -- end
-        -- i = 0
-        -- if ud_b ~= nil then
-        --     for k, v in pairs(ud_b) do
-        --         io.write(string.format("key: %s, value: %s\n", k, v))
-        --         i = i + 1
-        --         if i % 2 == 0 then
-        --             io.write(string.format("\n"))
-        --         end
-        --     end
-        -- end
-        -- Handle collisions between eg. 'Front' and 'Ball'
+
         for i, o in pairs(handlers.begin) do
             -- copy fixture names for handler
-            local names = { o.names[1], o.names[2] }
+            -- local names = { o.names[1], o.names[2] }
             local handler = o.handler
-            -- remove from local fixture names copy if matched
             if (ud_a ~= nil and ud_b ~= nil) then
-                for j = #names, 1, -1 do
-                    if names[j] == ud_a["name"] or names[j] == ud_b["name"] then
-                        table.remove(names, j)
-                    end
+                io.write(string.format("handler: %s\n", handler))
+                if handler.test(ud_a["name"], ud_b["name"]) then
+                    handler.invoke(fixtureA, fixtureB, contact)
                 end
-                if #names == 0 then
-                    handler(fixtureA, fixtureB, contact)
-                end
-            end
+            end -- else print error?
+            -- remove from local fixture names copy if matched
+            -- if (ud_a ~= nil and ud_b ~= nil) then
+            --     for j = #names, 1, -1 do -- todo update to use Contains?
+            --         if names[j] == ud_a["name"] or names[j] == ud_b["name"] then
+            --             -- should the above the adjustable?
+            --             -- eg. handler.test(aName,bName), handler.invoke(a,b,contact)
+            --             table.remove(names, j)
+            --         end
+            --     end
+            --     if #names == 0 then
+            --         handler(fixtureA, fixtureB, contact)
+            --     end
+            -- end
         end
         -- do not use contact after this function returns
     end

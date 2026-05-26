@@ -2,7 +2,7 @@ local MenuShader = {}
 MenuShader.__index = MenuShader
 
 function MenuShader.load()
-    MenuShader.shader = love.graphics.newShader("agent/copilot/desatmini.glsl")
+    MenuShader.shader = love.graphics.newShader("agent/copilot/shaders/desatmini.glsl")
 end
 
 function MenuShader:apply(selected)

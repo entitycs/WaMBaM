@@ -1,21 +1,20 @@
 local Front = {}
 Front.__index = Front
 
-local Shockwave = require("agent.copilot.shockwave")
+local Shockwave = require("agent.copilot.shaders.shockwave")
 local RotVis = require("agent.glm.rotvis")
+local streakShader = require("core.shaders.streakshader")
 
 
 function Front.new()
     local self = setmetatable({
-
         effects = {},
-        rotVis = nil
+        rotVis = nil,
+        streaks = {},
+        rear = {}
     }, Front)
-
-
     return self
 end
-
 
 function Front:collisionOnEnter(fixture_a, fixture_b, contact)
     -- Handle collisions between 'Front' and 'Ball'
@@ -26,18 +25,15 @@ function Front:collisionOnEnter(fixture_a, fixture_b, contact)
     end
 end
 
-
 function Front:applyBraking(inputValue)
     self.body:setLinearDamping(25 * inputValue + 0.5)
     self.body:setAngularDamping(25 * inputValue + 0.5)
 end
 
-
 function Front:releaseBraking()
-    self.body:setLinearDamping(0.5)
+    self.body:setLinearDamping(3)
     self.body:setAngularDamping(1)
 end
-
 
 function Front:load(window, world, rear, contactHandler, playerCount)
     self.size = rear.size
@@ -48,20 +44,33 @@ function Front:load(window, world, rear, contactHandler, playerCount)
     self.fixture = love.physics.newFixture(self.body, self.shape, 1)
     self.fixture:setRestitution(0.85)
     self.fixture:setFriction(0.0)
-    self.fixture:setUserData({ name = "Front"..playerCount })
+    self.fixture:setUserData({ name = "Front" .. playerCount })
     self.body:setMass(FrontWheelMass(rear.body:getMass()))
     self.body:setGravityScale(FrontWheelGravityScale(rear.body:getGravityScale()))
     self:releaseBraking()
     -- rotation visualization
     local name = "FrontLine"
-    self.rotVis = RotVis:new(self.size, self.body, name)
-     
-    -- contact visualization
-    contactHandler:addBegin("Front"..playerCount, "Ball", function(a, b, contact)
-        return self:collisionOnEnter(a, b, contact)
-    end)
-end
+    self.rotVis = RotVis.new(self.size, self.body, name)
 
+    -- contact visualization
+    contactHandler:addBegin( {
+        test = function(nameA, nameB)
+            local names = {nameA, nameB}
+            if not Pop(names, "Ball") then
+                return false
+            end
+            if not Pop(names, "Front" .. playerCount) then
+                return false
+            end
+            return true
+        end,
+        invoke = function(a, b, contact)
+            return self:collisionOnEnter(a, b, contact)
+        end,
+    })
+    streakShader:load()
+    self.rear = rear
+end
 
 function Front:update(dt, window, world)
     self:releaseBraking()
@@ -72,11 +81,38 @@ function Front:update(dt, window, world)
             table.remove(self.effects, i)
         end
     end
-end
+    local vel = self.body:getLinearVelocity()
+    -- local frontAngVel = self.front.body:getAngularVelocity()
 
+    local angle = math.atan(
+        self.body:getY() - self.rear.body:getY(),
+        self.body:getX() - self.rear.body:getX()
+    )
+    local rx, ry     = self.body:getPosition()
+    -- local fx, fy = self.front.body:getPosition()
+
+    -- rear streak
+    if math.abs(vel) > 400 then
+        print("streak")
+        table.insert(self.streaks,
+            streakShader.new(rx, ry, angle, { 1, 0.4, 0.4 })
+        )
+    end
+    -- update streaks
+    for i = #self.streaks, 1, -1 do
+        local s = self.streaks[i]
+        s:update(dt)
+        if s.dead then
+            table.remove(self.streaks, i)
+        end
+    end
+end
 
 function Front:draw()
     love.graphics.setColor(0.4, 1, 0.4)
+    for _, s in ipairs(self.streaks) do
+        s:draw()
+    end
     love.graphics.circle("fill",
         self.body:getX(),
         self.body:getY(),

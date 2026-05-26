@@ -1,6 +1,6 @@
 require("core.utils.input")
 require("agent.copilot.menuitempos")
-local menuShader = require("agent.copilot.menushader")
+local menuShader = require("agent.copilot.shaders.menushader")
 local menuWamBam = love.graphics.newImage("images/MenuWamBam.png", { dpiscale = 3 })
 local pausedImage = love.graphics.newImage("images/MenuPaused.png", { dpiscale = 3 })
 local resumeImage = love.graphics.newImage("images/MenuResume-02.png", { dpiscale = 6 })
@@ -10,6 +10,8 @@ local mainMenuImage = love.graphics.newImage("images/MenuMain-CP.png", { dpiscal
 local confirmImage = love.graphics.newImage("images/MenuExit-CP.png", { dpiscale = 5 })
 local yesImage = love.graphics.newImage("images/MenuYes.png", { dpiscale = 4 })
 local noImage = love.graphics.newImage("images/MenuNo.png", { dpiscale = 4 })
+
+
 -- Partial Definition for States
 local states = {
     previous = {
@@ -21,6 +23,14 @@ local states = {
         keyMap = "m",
         selected = false,
         nodes = {}
+    },
+    arena = {
+        title = "arena",
+        joyMap = "rightshoulder",
+        keyMap = "a",
+        selected = false,
+        nodes = {},
+        controller = nil
     },
     game = {
         title = "playing",
@@ -54,14 +64,16 @@ local states = {
 
 -- Define States 'graph'
 states.previous = states.landing
-states.landing.nodes = { states.game, states.confirmExit } -- future home of settings?
+states.landing.nodes = { states.game, states.arena, states.confirmExit } -- future home of settings?
+states.arena.nodes = { states.landing }
 states.game.nodes = { states.paused }
 states.paused.nodes = { states.game, states.landing, states.confirmExit }
 states.confirmExit.nodes = { states.exit }
 
 -- Define States 'contents'
 states.landing.images = { pauseImage, exitImage }
-states.game.images = { pauseImage }
+states.arena.images = { yesImage }
+states.game.images = {  }
 states.paused.images = { resumeImage, mainMenuImage, exitImage }
 states.confirmExit.images = { yesImage, noImage }
 
@@ -87,6 +99,18 @@ states.landing.trigger = {
     end },
     onEnter = function(window, world)
         print("LANDING")
+    end
+}
+
+states.arena.trigger = {
+    onTest = { function()
+        if CheckConsumeInput(states.landing) then
+            return 1
+        end
+        return 0
+    end },
+        onEnter = function(window, world)
+        print("ARENA!!!")
     end
 }
 

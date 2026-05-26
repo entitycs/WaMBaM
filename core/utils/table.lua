@@ -6,3 +6,13 @@ function Contains(tab, val)
     end
     return false
 end
+
+function Pop(tab, val)
+     for i = #tab, 1, -1 do
+        if tab[i] == val then
+            table.remove(tab, i)
+            return val
+        end        
+    end
+    return nil
+end

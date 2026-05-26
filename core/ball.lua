@@ -20,7 +20,7 @@ function Ball:load(window, world, radius)
 
     -- Create a line shape for rotation visualization (glm-4.7)
     local name = "BallLine"
-    BallRotVis = RotVis:new(radius, self.body, name)
+    BallRotVis = RotVis.new(radius, self.body, name)
 end
 
 function Ball:update(dt)
@@ -40,7 +40,7 @@ function Ball:draw()
     )
     love.graphics.setColor(0, 0, 0)
     -- Draw rotation indicator line (glm-4.7)
-    if BallRotVis ~= nil then BallRotVis:draw() end
+    if BallRotVis then BallRotVis:draw() end
     love.graphics.setColor(1, 1, 1)
 end
 

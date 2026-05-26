@@ -78,6 +78,13 @@ function JoystickInput:update(dt)
     end
 
     for _, l in ipairs(listeners) do
+        if self.joystick:isGamepadDown("rightshoulder") then
+        
+            l:onTrigger("rightshoulder", 1)
+        end
+    end
+
+    for _, l in ipairs(listeners) do
         l:onTrigger("triggerleft", self.joystick:getGamepadAxis("triggerleft"))
     end
 

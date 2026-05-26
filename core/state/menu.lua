@@ -1,7 +1,9 @@
 require("core.utils.input")
+require("core.utils.table")
 local states = require("core.state.definition")
+local ArenaState = require("core.state.arena")
 local JoystickInputProto = require("core.input.joystick")
-local menuShader = require("agent.copilot.menushader")
+local menuShader = require("agent.copilot.shaders.menushader")
 local getMenuItemPos = require("agent.copilot.menuitempos")
 
 local cursor = 1
@@ -33,7 +35,10 @@ local StateMachine = {
 }
 
 
-function StateMachine:load()
+function StateMachine:load(window)
+    if not states.arena.controller then 
+        states.arena.controller = ArenaState.new(window)
+    end
     if not StateMachine.state then
         StateMachine.state = states.landing
     end
@@ -100,6 +105,10 @@ function StateMachine:update(dt)
             self:load()
         end
     end
+    -- arenas
+    if self.state == states.arena and states.arena.controller then
+        states.arena.controller:update(dt)
+    end
 
     -- return false if game should be paused, true otherwise
     return self.state.title == states.game.title
@@ -117,6 +126,11 @@ function StateMachine:draw(window)
             menuShader:draw(image, x, y, self.state.nodes[i].selected)
         end
     end
+    -- arena
+    if self.state == states.arena then
+        states.arena.controller:draw()
+    end
+
     self:onDrawQueue()
 end
 

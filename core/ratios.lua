@@ -11,5 +11,5 @@ function FrontWheelGravityScale(rearWheelGravityScale)
 end
 
 function FrontWheelTorque(rearWheelForce)
-    return rearWheelForce * 2 -- 2.5
+    return rearWheelForce *  5
 end

@@ -1,5 +1,6 @@
 require("core.ratios")
 require("current.arena")
+require("core.utils.table")
 local Menu = require("core.state.menu")
 Arena = require("core.arena")
 local Ball = require("core.ball")
@@ -16,10 +17,27 @@ end
 local window = {}
 local world
 
-local function reloadBall(fixtureA, fixtureB, contact)
-    Ball:drop(window.right / 2 - Ball.shape:getRadius() / 2, 30)
-    love.audio.play(love.audio.newSource("audio/score.wav", "static"))
-end
+local reloadBall = {
+    test =  function (aName, bName)
+        local names = { aName, bName }
+        if not Pop(names, "Ball") then
+            return false
+        end
+        local collider = names[1]
+        if not collider then return false end
+        -- note: NOT regex
+        return string.match(collider, "^Goal%d*$") ~= nil
+    end ,
+    invoke = function (fixtureA, fixtureB, contact)
+        Ball:drop(window.right / 2 - Ball.shape:getRadius() / 2, 30)
+        love.audio.play(love.audio.newSource("audio/score.wav", "static"))
+    end
+}
+
+-- local function reloadBall(fixtureA, fixtureB, contact)
+--     Ball:drop(window.right / 2 - Ball.shape:getRadius() / 2, 30)
+--     love.audio.play(love.audio.newSource("audio/score.wav", "static"))
+-- end
 
 local center = {} -- connector
 
@@ -36,14 +54,14 @@ function love.load()
 
     -- Create new World
     world = love.physics.newWorld(0, 90, true)
-    Menu:load()
+    Menu:load(window)
     -- Set contact handling callback
     local contactHandler = ContactHandler.new(world)
     world:setCallbacks(contactHandler.beginContact)
 
     -- Add to contact handling callback list, post-set!
-    contactHandler:addBegin("Ball", "Goal1", reloadBall)
-    contactHandler:addBegin("Ball", "Goal2", reloadBall)
+    contactHandler:addBegin(reloadBall)
+    contactHandler:addBegin(reloadBall)
 
     local wheelSize = 10
 
