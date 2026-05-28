@@ -1,4 +1,4 @@
-local streakShader = require("core.shaders.streakshader")
+local streakShader = require("agent.copilot.shaders.streakshader")
 local Rear = {}
 Rear.__index = Rear
 
@@ -41,10 +41,10 @@ function Rear:load(window, world, front, size, playerCount)
     self.fixture:setFriction(2)
     self.fixture:setUserData({name = "Rear"..playerCount})
     self.body:setMass(6)
-    self.body:setGravityScale(1)
+    self.body:setGravityScale(3)
     self:releaseBraking()
     local dimmer = 1.0
-    self.force = self.body:getMass() * 175 * dimmer
+    self.force = self.body:getMass() * 220 * dimmer
     self.rotVis = RotVis.new(self.size, self.body, "RearRotation")
     self.front = front
     streakShader:load()

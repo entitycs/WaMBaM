@@ -81,6 +81,8 @@ function JoystickInput:update(dt)
         if self.joystick:isGamepadDown("rightshoulder") then
         
             l:onTrigger("rightshoulder", 1)
+        else
+            l:onTrigger("rightshoulder", 0)
         end
     end
 

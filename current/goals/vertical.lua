@@ -59,39 +59,8 @@ function Goal.new(world, ballSize, posX, posY, flip)
 
     -- treat posX and posY as recommendations
     local body = love.physics.newBody(world, posX, posY, "static")
-    -- local points
-
-    -- -- Create vertical elongated shape with a gap in the center
-    -- if flip then
-    --     -- Right side of field: goal entirely on the negative side of 0
-    --     for i = 1, #edgeData.flipped do
-    --         if i % 2 == 1 then
-    --             points[i] = -edgeData.flipped[i] * goalWidth
-    --         else
-    --             points[i] = edgeData.flipped[i] * goalHeight
-    --         end
-    --     end
-    --     -- points = {
-    --     --     -goalWidth, 0,
-    --     --     -3 * goalWidth / 4, goalHeight,
-    --     --     -goalWidth / 4, goalHeight,
-    --     --     0, 0
-    --     -- }
-    -- else
-    --     for i = 1, #edgeData.flipped do
-    --         if i % 2 == 1 then
-    --             points[i] = edgeData.points[i] * goalWidth
-    --         else
-    --             points[i] = edgeData.points[i] * goalHeight
-    --         end
-    --     end
-    --     -- points = {
-    --     --     goalWidth, 0,
-    --     --     3 * goalWidth / 4, goalHeight,
-    --     --     goalWidth / 4, goalHeight,
-    --     --     0, 0
-    --     -- }
-    -- end
+    
+    -- goal (inner section - sensor)
     local points = Goal.getPoints(ballSize, flip)
     local shape = love.physics.newPolygonShape(points)
     local fixture = love.physics.newFixture(body, shape, 30)
@@ -102,7 +71,11 @@ function Goal.new(world, ballSize, posX, posY, flip)
 
     -- from copilot, get center of goal polygon
     local newPoints = centerAndScale(points, 1.25)
+
+    -- goal (edges - collision)
+    -- for each two pairs of points (overlapping last to first)
     for i = 1, #newPoints, 2 do
+        -- ignoring open edges
         if not Contains(openEdges, i) then
             local x1 = newPoints[i]
             local y1 = newPoints[(i + 1)]

@@ -164,14 +164,26 @@ treeView-beta
     "backdrops/"
       "maxresdefault.jpg"
     "core/"
+      "goals/"
+        "geometry.lua"
+        "goal.lua"
+      "input/"
+        "joystick.lua"
+        "keyboard.lua"
+      "shaders/"
+      "state/"
+      "utils/"
       "arena.lua"
+      "audio.lua"
       "ball.lua"
-      "goal.lua"
-      "joystick.lua"
+      "contact.lua"
       "ratios.lua"
     "current/"
+        "goals/"
+          "registry.lua"
+          "goals.lua"
+          "vertical.lua"
       "arena.lua"
-      "goals.lua"
     "release/"
     "build.sh"
     "main.lua"
@@ -269,7 +281,7 @@ classDiagram
 
 #### core/contact.lua
 
-- Handles world collisions 
+- Handles world collisions
 - Pub/Sub pattern allowing for adding/removing callbacks
   - implemented for `begin` callback only initially.
   - other callbacks will be implemented here if necessary, alongside the `begin` table.

@@ -1,5 +1,5 @@
 -- arena_state.lua -- copilot
-local registry = require("core.goals.registry")
+local registry = require("current.goals.registry")
 
 local ArenaState = {}
 ArenaState.__index = ArenaState

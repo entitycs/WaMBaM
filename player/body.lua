@@ -3,6 +3,7 @@ local KeyboardInput = require("core.input.keyboard")
 local RearProto = require("player.rear")
 local FrontProto = require("player.front")
 local AudioProto = require("core.audio")
+local BodyBoost = require("core.abilities.boost")
 
 local playerCount = 1
 
@@ -28,6 +29,7 @@ function Player.new()
         joystickInput = nil,
         front = FrontProto.new(),
         rear = RearProto.new(),
+        boost = BodyBoost.new(),
         audio = AudioProto.new(),
         currentState = {
             x = 0,
@@ -36,6 +38,8 @@ function Player.new()
             boostValue = 0,
             torqueValue = { x = 0, y = 0 },
             brakeReleasedThisFrame = false,
+            previousStickAngle = 0,
+            inputAngularVelocity = 0,
         },
         collisionOnEnterRear = function() end,
         collisionOnEnterFront = function() end,
@@ -94,6 +98,9 @@ function Player:load(window, world, wheelSize, contactHandler)
     self.joystickInput = JoystickInputProto.new({ self }) -- todo make a bodyForceHandler?
     self.joystickInput:load(self.rear, self.front, limitingVel)
     -- todo, pass playercount, then attempt fallback controller if > available controllers/inputs
+    -- abilities
+    BodyBoost:load ( )
+
     
     -- load audio for collisions
     self.audio:load({ wam = "audio/wam.wav", bam = "audio/bam.wav", score = "audio/score.wav" })
@@ -105,11 +112,38 @@ function Player:load(window, world, wheelSize, contactHandler)
 end
 
 function Player:update(dt)
-
     self.rear:update(dt)
     self.front:update(dt)
+    self.boost:update(dt)
     self.joystickInput:update(dt)
     KeyboardInput:update(dt)
+
+
+    local rx, ry = self.rear.body:getPosition()
+    local fx, fy = self.front.body:getPosition()
+    local sx, sy = math.abs(rx - fx), math.abs(ry - fy)
+    local rquad = 1
+
+    -- check quadrant
+    if fx > rx then
+        if fy < ry then
+            rquad = 2
+        end
+    elseif fy < ry then
+        rquad = 4
+    else
+        rquad = 3
+    end
+
+
+    local rotDir = 0
+    if sx > 0.1 then
+        rotDir = 1  -- right = clockwise
+    elseif sx < -0.1 then
+        rotDir = 1  -- left = counter-clockwise
+    end
+
+
 
     self.rear.body:applyLinearImpulse(
         dt * self.currentState.forceValue.x,
@@ -117,8 +151,8 @@ function Player:update(dt)
     )
 
     self.front.body:applyLinearImpulse(
-        dt * self.currentState.torqueValue.x,
-        dt * self.currentState.torqueValue.y
+        dt * self.currentState.torqueValue.x * rotDir,
+        dt * self.currentState.torqueValue.y * rotDir
     )
 
     -- zero out 'summed' forces after applying
@@ -126,6 +160,8 @@ function Player:update(dt)
     self.currentState.forceValue = { x = 0, y = 0 }
     self.currentState.torqueValue = { x = 0, y = 0 }
     self.currentState.brakeValue = 0
+    -- self.currentState.inputAngularVelocity = 0
+    -- self.currentState.previousStickAngle =
 end
 
 function Player:draw()
@@ -148,6 +184,7 @@ function Player:draw()
     love.graphics.print("AngularVelocity: " .. angVel, 200 * self.id, 140)
 
     self.joystickInput:draw()
+    self.boost:draw(self.window)
 end
 
 local collisionOnEnter = {
@@ -160,12 +197,18 @@ end
 -- callbacks from InputHandler (ie. Joystick)
 function Player:onTrigger(triggerName, triggerValue)
     if triggerName == inputMap.wamBoost then
-        self:applyVectorBoost(2 * triggerValue)
+        if self.boost:onLance(triggerValue) then
+            self:applyVectorBoost(2 * triggerValue)
+        end
+ 
     elseif triggerName == inputMap.braking then
         self:applyBraking(triggerValue)
     elseif triggerName == inputMap.boost then
-        self:applyBoost(triggerValue)
+        if self.boost:onWam(triggerValue) then
+            self:applyBoost(4 * triggerValue)
+        end
     end
+    
 end
 
 function Player:onTriggerRelease(triggerName)
@@ -173,6 +216,8 @@ function Player:onTriggerRelease(triggerName)
 end
 
 function Player:onAxis(axisName, axisValue)
+    if axisName == inputMap.torqueX then self.joystickX = axisValue end
+    if axisName == inputMap.torqueY then self.joystickY = axisValue end
     self:applyAcceleration(axisName, axisValue)
 end
 
@@ -181,7 +226,7 @@ function Player:applyBraking(brakeValue)
         self.currentState.x, self.currentState.y = self.rear.body:getLinearVelocity()
         self.currentState.brakeReleasedThisFrame = true
         self.front:applyBraking(brakeValue)
-        self.rear:applyBraking(brakeValue) -- note, may still be a no-op
+        self.rear:applyBraking(brakeValue)               -- note, may still be a no-op
     elseif self.currentState.brakeReleasedThisFrame then -- onTriggerRelease(triggerright)
         -- average out front and back velocities over the frame following braking
         self.front:releaseBraking()
@@ -193,7 +238,6 @@ function Player:applyBraking(brakeValue)
         self.currentState.brakeReleasedThisFrame = false
     end
 end
-
 
 function Player:checkLimits(bodyPart, limitingVel)
     local curVelX, curVelY = self[bodyPart].body:getLinearVelocity()
@@ -210,7 +254,6 @@ function Player:checkLimits(bodyPart, limitingVel)
     end
     return limitedX, limitedY
 end
-
 
 function Player:applyAcceleration(axisName, accelerationValue)
     local limitedX, limitedY = self:checkLimits("rear", limitingVel)
@@ -230,20 +273,36 @@ function Player:applyAcceleration(axisName, accelerationValue)
     self.currentState.forceValue.x = xForce
     self.currentState.forceValue.y = yForce
 
-    -- lets try w/ and w/out limits for torque
-    limitedX, limitedY = self:checkLimits("front", limitingVel * 1.5)
-    if axisName == inputMap.torqueY and not limitedY then
-        if self.rear.body:getX() ~= self.front.body:getX() then
-            self.currentState.torqueValue.y = 1 + self.front.torque * accelerationValue
-            self.currentState.forceValue.y = self.currentState.forceValue.y - 0.65 * self.currentState.torqueValue.y
-        end
-    elseif axisName == inputMap.torqueX and not limitedX then
-        if self.rear.body:getX() ~= self.front.body:getX() then
-            self.currentState.torqueValue.x = 1 + self.front.torque * accelerationValue
-            self.currentState.forceValue.x = self.currentState.forceValue.x - 0.65 * self.currentState.torqueValue.x
 
+    -- new idea: for increased ease of usability in 'swiping'
+    -- measure dx, dy for front vs rear.  if dy > dx, ignore y 'torque'
+    -- and vice versa.
+    local rx, ry = self.rear.body:getX(), self.rear.body:getY()
+    local fx, fy = self.front.body:getX(), self.front.body:getY()
+    local dx, dy = math.abs(rx - fx), math.abs(ry - fy)
+
+-- if ry <= fy then return end
+
+
+    -- lets try w/ and w/out limits for torque
+    limitedX, limitedY = self:checkLimits("front", limitingVel * 2.15) -- magic number
+    if axisName == inputMap.torqueY and not limitedY then
+        -- if dx >= dy
+        -- or (accelerationValue > 0 and fy > ry)
+        -- or (accelerationValue < 0 and fy < ry) then
+            self.currentState.torqueValue.y = 1 + self.front.torque * accelerationValue
+            self.currentState.forceValue.y = self.currentState.forceValue.y - 0.95 * self.currentState.torqueValue.y
+        -- end
+    elseif axisName == inputMap.torqueX and not limitedX then
+        -- if dy >= dx
+        --     or (accelerationValue > 0 and fx > rx)
+        --     or (accelerationValue < 0 and fx < rx)
+        -- then+-++
+         
+            self.currentState.torqueValue.x = 1 + self.front.torque * accelerationValue
+            self.currentState.forceValue.x = self.currentState.forceValue.x - 0.95 * self.currentState.torqueValue.x
             -- self.front.body:applyLinearImpulse(self.currentAngle.impulse, 0)
-        end
+        -- end
     end
 end
 

@@ -1,5 +1,5 @@
 --- Arena 'Model'
-local Goals = require("current.goals")
+local Goals = require("current.goals.container")
 
 CurrentArena = {
      backdrop = love.graphics.newImage('backdrops/maxresdefault.jpg')

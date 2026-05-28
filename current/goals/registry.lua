@@ -2,12 +2,12 @@ return {
     -- do not edit core goal
     bucket = {
         name = "Bucket",
-        module = "core.goal"
+        module = "core.goals.default"
     },
     -- thin, long vertical example
     vertical = {
         name = "Vertical",
-        module = "core.goals.vertical"
+        module = "current.goals.vertical"
     },
     -- add more here
 }

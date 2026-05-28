@@ -1,5 +1,4 @@
--- local Goal = require("core.goals.vertical")
-local registry = require("core.goals.registry")
+local registry = require("current.goals.registry")
 local Goal1 = nil
 local Goal2 = nil
 local Goals = {}

@@ -3,7 +3,7 @@ function BallSize(wheelSize)
 end
 
 function FrontWheelMass(rearWheelMass)
-    return  0
+    return  1
 end
 
 function FrontWheelGravityScale(rearWheelGravityScale)
@@ -11,5 +11,5 @@ function FrontWheelGravityScale(rearWheelGravityScale)
 end
 
 function FrontWheelTorque(rearWheelForce)
-    return rearWheelForce *  5
+    return rearWheelForce *  3
 end
