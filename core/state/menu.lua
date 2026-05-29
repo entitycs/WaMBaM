@@ -6,8 +6,12 @@ local JoystickInputProto = require("core.input.joystick")
 local menuShader = require("agent.copilot.shaders.menushader")
 local getMenuItemPos = require("agent.copilot.menuitempos")
 
+local StateMachine = {
+    state = states.landing
+}
 local cursor = 1
 local joystick = {}
+
 
 local function cursorNext(nodes)
     cursor = cursor + 1
@@ -30,11 +34,9 @@ local function cursorReset()
 end
 
 
-local StateMachine = {
-    state = states.landing
-}
-
-
+--------------------------------------------------------------------------------
+-- Load
+--------------------------------------------------------------------------------
 function StateMachine:load(window)
     if not states.arena.controller then 
         states.arena.controller = ArenaState.new(window)
@@ -51,6 +53,15 @@ function StateMachine:load(window)
         joystick = JoystickInputProto.new()
     end
     cursorReset()
+
+    -- load
+    for _, astate in pairs(states) do
+        if astate.onLoad then
+            astate.onLoad(window)
+        end
+    end
+
+    -- enter
     if self.state ~= nil then
         self.state.trigger.onEnter(self.state.previous, drawInstruction)
         states.previous = self.state
@@ -59,6 +70,9 @@ function StateMachine:load(window)
 end
 
 
+--------------------------------------------------------------------------------
+-- Update
+--------------------------------------------------------------------------------
 function StateMachine:update(dt)
     -- selection up/down (joystick only -- keyboard todo)
     for _, btn in pairs({ "dpdown", "dpright" }) do
@@ -90,7 +104,7 @@ function StateMachine:update(dt)
 
     -- for each reachable next state, set selected from cursor
     for k, node in ipairs(self.state.nodes) do
-         if cursor == k then
+        if cursor == k then
             node.selected = true
             currentSelection = node
         else
@@ -115,6 +129,9 @@ function StateMachine:update(dt)
 end
 
 
+--------------------------------------------------------------------------------
+-- Draw
+--------------------------------------------------------------------------------
 function StateMachine:draw(window)
     local image = nil
     love.graphics.setColor(1, 1, 1, 1)
@@ -134,7 +151,11 @@ function StateMachine:draw(window)
     self:onDrawQueue()
 end
 
-
+------------------------------------------------------
+-- onDrawQueue
+--
+-- Used to draw data queued outside of draw lifecycle
+------------------------------------------------------
 function StateMachine:onDrawQueue()
     for _, instruction in pairs(self.drawQueueInstructions) do
         instruction()

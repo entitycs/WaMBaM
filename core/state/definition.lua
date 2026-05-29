@@ -1,6 +1,7 @@
 require("core.utils.input")
 require("agent.copilot.menuitempos")
 local menuShader = require("agent.copilot.shaders.menushader")
+
 local menuWamBam = love.graphics.newImage("images/MenuWamBam.png", { dpiscale = 3 })
 local pausedImage = love.graphics.newImage("images/MenuPaused.png", { dpiscale = 3 })
 local resumeImage = love.graphics.newImage("images/MenuResume-02.png", { dpiscale = 6 })
@@ -10,7 +11,7 @@ local mainMenuImage = love.graphics.newImage("images/MenuMain-CP.png", { dpiscal
 local confirmImage = love.graphics.newImage("images/MenuExit-CP.png", { dpiscale = 5 })
 local yesImage = love.graphics.newImage("images/MenuYes.png", { dpiscale = 4 })
 local noImage = love.graphics.newImage("images/MenuNo.png", { dpiscale = 4 })
-
+local menuOptions = love.graphics.newImage("images/MenuOptions.png", {dpiscale = 5})
 
 -- Partial Definition for States
 local states = {
@@ -32,6 +33,7 @@ local states = {
         nodes = {},
         controller = nil
     },
+
     game = {
         title = "playing",
         joyMap = "start",
@@ -71,8 +73,8 @@ states.paused.nodes = { states.game, states.landing, states.confirmExit }
 states.confirmExit.nodes = { states.exit }
 
 -- Define States 'contents'
-states.landing.images = { pauseImage, exitImage }
-states.arena.images = { yesImage }
+states.landing.images = { pauseImage, menuOptions, exitImage }
+states.arena.images = { menuOptions }
 states.game.images = {  }
 states.paused.images = { resumeImage, mainMenuImage, exitImage }
 states.confirmExit.images = { yesImage, noImage }
@@ -87,7 +89,9 @@ states.game.text = { "Press Start/Esc to pause" }
 states.paused.text = { "Resume", "Exit to Menu", "Exit Game" }
 states.confirmExit.text = {"Yes", "No"}
 
+-- handlers
 states.landing.trigger = {
+    onLoad = function (window) end,
     onTest = { function()
         if CheckConsumeInput(states.game) then
             return 1
