@@ -1,6 +1,6 @@
 local Front = {}
 Front.__index = Front
-
+--1780165059.9047
 local Shockwave = require("agent.copilot.shaders.shockwave")
 local RotVis = require("agent.glm.rotvis")
 local streakShader = require("agent.copilot.shaders.streakshader")
@@ -43,7 +43,7 @@ function Front:load(window, world, rear, contactHandler, playerCount)
     self.shape = love.physics.newCircleShape(self.size)
     self.fixture = love.physics.newFixture(self.body, self.shape, 1)
     self.fixture:setRestitution(0.85)
-    self.fixture:setFriction(1.0)
+    self.fixture:setFriction(100.0)
     self.fixture:setUserData({ name = "Front" .. playerCount })
     self.body:setMass(FrontWheelMass(rear.body:getMass()))
     self.body:setGravityScale(FrontWheelGravityScale(rear.body:getGravityScale()))

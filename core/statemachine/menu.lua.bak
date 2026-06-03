@@ -1,48 +1,49 @@
 require("core.utils.input")
 require("core.utils.table")
-local states = require("core.state.definition")
-local ArenaState = require("core.state.arena")
-local JoystickInputProto = require("core.input.joystick")
+local states = require("core.state")
+local arenaStateProto = require("core.state.arena")
+local joystickInputProto = require("core.input.joystick")
 local menuShader = require("agent.copilot.shaders.menushader")
 local getMenuItemPos = require("agent.copilot.menuitempos")
+local machine = require("core.statemachine")
 
-local StateMachine = {
+local Menu = {
     state = states.landing
 }
-local cursor = 1
+-- local cursor = 1
 local joystick = {}
 
 
-local function cursorNext(nodes)
-    cursor = cursor + 1
-    if cursor > #nodes then
-        cursor = 1
-    end
-end
+-- local function cursorNext(nodes)
+--     cursor = cursor + 1
+--     if cursor > #nodes then
+--         cursor = 1
+--     end
+-- end
 
 
-local function cursorPrev(nodes)
-    cursor = cursor - 1
-    if cursor < 1 then
-        cursor = #nodes
-    end
-end
+-- local function cursorPrev(nodes)
+--     cursor = cursor - 1
+--     if cursor < 1 then
+--         cursor = #nodes
+--     end
+-- end
 
 
-local function cursorReset()
-    cursor = 1
-end
+-- local function cursorReset()
+--     cursor = 1
+-- end
 
 
 --------------------------------------------------------------------------------
 -- Load
 --------------------------------------------------------------------------------
-function StateMachine:load(window)
-    if not states.arena.controller then 
-        states.arena.controller = ArenaState.new(window)
+function Menu:load(window)
+    if not states.arena.controller then
+        states.arena.controller = arenaStateProto.new(window)
     end
-    if not StateMachine.state then
-        StateMachine.state = states.landing
+    if not Menu.state then
+        Menu.state = states.landing
     end
     self.drawQueueInstructions = {}
     local drawInstruction = self.state.drawInstruction
@@ -50,9 +51,9 @@ function StateMachine:load(window)
         table.insert(self.drawQueueInstructions, drawInstruction)
     end
     if not joystick then
-        joystick = JoystickInputProto.new()
+        joystick = joystickInputProto.new()
     end
-    cursorReset()
+    machine:cursorReset()
 
     -- load
     for _, astate in pairs(states) do
@@ -69,51 +70,61 @@ function StateMachine:load(window)
     menuShader.load()
 end
 
-
 --------------------------------------------------------------------------------
 -- Update
 --------------------------------------------------------------------------------
-function StateMachine:update(dt)
+function Menu:update(dt)
     -- selection up/down (joystick only -- keyboard todo)
     for _, btn in pairs({ "dpdown", "dpright" }) do
-        if JoystickInputProto.consumeButton(btn) then
-            cursorNext(self.state.nodes)
+        if joystickInputProto.consumeButton(btn) then
+            machine:cursorNext()
         end
     end
     for _, btn in pairs({ "dpup", "dpleft" }) do -- ? can both be present in 1 update
-        if JoystickInputProto.consumeButton(btn) then
-            cursorPrev(self.state.nodes)
+        if joystickInputProto.consumeButton(btn) then
+            machine:cursorPrev()
         end
     end
 
     -- Two options for selecting + loading next state:
     -- 1) trigger test (eg. start button pressed during playing/game state)
     -- 2) directional cursor selects, and designated key/joystick button applies selection
-    local currentSelection = nil
+    -- local currentSelection = machine:getSelectedNode() -- moved below
 
     -- for each reachable state, test for trigger to load
-    for _, nodeTest in pairs(self.state.trigger.onTest) do
-        local res = nodeTest()
-        -- load by returned next index if non-zero result
-        if res > 0 then
-            self.state = self.state.nodes[res]
-            self:load()
-            return self.state.title == states.game.title
-        end
+    local targetIndex, targetState = machine:onTest()
+    if targetIndex > 0 then
+        -- transition
+        self.state = targetState
+        self:load()
+        machine:load(targetState)
+        return self.state.title == states.game.title or self.state.title == states.tutorial.title
     end
+    -- for _, nodeTest in pairs(self.state.trigger.onTest) do
+    --     local res = nodeTest()
+    --     -- load by returned next index if non-zero result
+    --     if res > 0 then
+    --         self.state = self.state.nodes[res]
+    --         self:load()
+    --         return self.state.title == states.game.title
+    --     end
+    -- end
 
-    -- for each reachable next state, set selected from cursor
-    for k, node in ipairs(self.state.nodes) do
-        if cursor == k then
-            node.selected = true
-            currentSelection = node
-        else
-            node.selected = false
-        end
-    end
+    -- -- for each reachable next state, set selected from cursor
+    -- for k, node in ipairs(self.state.nodes) do
+    --     if cursor == k then
+    --         node.selected = true
+    --         currentSelection = node
+    --     else
+    --         node.selected = false
+    --     end
+    -- end
 
     -- check for selection trigger aligned with cursor
-    if self.state ~= states.game and JoystickInputProto.consumeButton("a") then
+    if self.state ~= states.game and
+        self.state ~= states.tutorial and
+        joystickInputProto.consumeButton("a") then
+        local currentSelection = machine:getSelectedNode()
         if currentSelection then
             self.state = currentSelection
             self:load()
@@ -128,11 +139,10 @@ function StateMachine:update(dt)
     return self.state.title == states.game.title
 end
 
-
 --------------------------------------------------------------------------------
 -- Draw
 --------------------------------------------------------------------------------
-function StateMachine:draw(window)
+function Menu:draw(window)
     local image = nil
     love.graphics.setColor(1, 1, 1, 1)
     if self.state.images then
@@ -156,10 +166,10 @@ end
 --
 -- Used to draw data queued outside of draw lifecycle
 ------------------------------------------------------
-function StateMachine:onDrawQueue()
+function Menu:onDrawQueue()
     for _, instruction in pairs(self.drawQueueInstructions) do
         instruction()
     end
 end
 
-return StateMachine
+return Menu

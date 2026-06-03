@@ -14,6 +14,11 @@ function Goals:load(window, world, ballSize, goalChoice)
     Goal2.fixture:setUserData({ name = "Goal2" })
 end
 
+function Goals:unload()
+    if Goal1 then Goal1:unload() end
+    if Goal2 then Goal2:unload() end
+end
+
 function Goals:draw()
     if Goal1 ~= nil then Goal1:draw() end -- Draw goals on the screen
     if Goal2 ~= nil then Goal2:draw() end -- Draw goals on the screen

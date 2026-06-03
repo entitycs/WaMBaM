@@ -129,7 +129,7 @@ function Player:update(dt)
     local rquad = 1
 
     -- -- check quadrant
-    -- if self.joystickInput.joystick ~= nil then 
+    -- if self.joystickInput.joystick ~= nil then
     --     self.motor:setLinearOffset(
     --         50 * self.joystickInput.joystick:getGamepadAxis("rightx"),
     --         50 * self.joystickInput.joystick:getGamepadAxis("righty")
@@ -162,8 +162,8 @@ function Player:update(dt)
     )
 
     self.front.body:applyLinearImpulse(
-        dt * self.currentState.torqueValue.x ,
-        dt * self.currentState.torqueValue.y  
+        dt * self.currentState.torqueValue.x,
+        dt * self.currentState.torqueValue.y
     )
 
     -- zero out 'summed' forces after applying
@@ -193,9 +193,11 @@ function Player:draw()
     local angVel = self.rear.body:getAngularVelocity()
     love.graphics.print("LinearVelocity: " .. curVel_x + curVel_y, 200 * self.id, 120)
     love.graphics.print("AngularVelocity: " .. angVel, 200 * self.id, 140)
-
+    love.graphics.push()   -- save world transform
+    love.graphics.origin() -- reset to screen space (no camera transform)
     self.joystickInput:draw()
     self.abilities:draw(self.window)
+    love.graphics.pop()
 end
 
 local collisionOnEnter = {
@@ -213,12 +215,12 @@ function Player:onTrigger(triggerName, triggerValue)
     --         self:applyVectorBoost(2 * triggerValue)
     --     end
     if triggerName == inputMap.braking then
-    --elseif triggerName == inputMap.braking then
+        --elseif triggerName == inputMap.braking then
         self:applyBraking(triggerValue)
-    -- elseif triggerName == inputMap.boost then
-    --     if self.boost:onWam(triggerValue) then
-    --         self:applyBoost(4 * triggerValue)
-    --     end
+        -- elseif triggerName == inputMap.boost then
+        --     if self.boost:onWam(triggerValue) then
+        --         self:applyBoost(4 * triggerValue)
+        --     end
     end
 end
 

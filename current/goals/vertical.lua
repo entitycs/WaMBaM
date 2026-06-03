@@ -124,4 +124,10 @@ function Goal:draw()
     love.graphics.setLineWidth(1)
 end
 
+
+function Goal:unload()
+    self.body:destroy()
+end
+
+
 return Goal

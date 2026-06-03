@@ -1,8 +1,8 @@
 -- arena_state.lua -- copilot
 local registry = require("current.goals.registry")
 
-local ArenaState = {}
-ArenaState.__index = ArenaState
+local ArenaMenu = {}
+ArenaMenu.__index = ArenaMenu
 
 
 local function drawGoalPreview(module, x, y, w, h)
@@ -59,7 +59,7 @@ local function drawGoalPreview(module, x, y, w, h)
 end
 
 
-function ArenaState.new(window)
+function ArenaMenu.new(window)
     local keys = {}
     for key, _ in pairs(registry) do
         keys[#keys + 1] = key
@@ -69,11 +69,11 @@ function ArenaState.new(window)
         window = window,
         keys = keys,
         index = 1, -- currently selected goal type
-    }, ArenaState)
+    }, ArenaMenu)
 end
 
 
-function ArenaState:update(dt)
+function ArenaMenu:update(dt)
     if love.keyboard.isDown("left") then
         self.index = math.max(1, self.index - 1)
     elseif love.keyboard.isDown("right") then
@@ -86,7 +86,7 @@ function ArenaState:update(dt)
 end
 
 
-function ArenaState:draw()
+function ArenaMenu:draw()
     if not self.window then return end
     local keys = self.keys
     local count = #keys
@@ -123,60 +123,5 @@ function ArenaState:draw()
     end
 end
 
-return ArenaState
+return ArenaMenu
 
--- local base = GoalModule.getBasePoints(40, false)
--- local scaled, edges = Geometry.build(base, {1,2}, 0.25)
--- local function drawGoalPreview(module, x, y, w, h)
---     -- get normalized points from goal module
---     local base = module.getPoints(1, false)  -- ballSize=1 gives normalized shape
-
---     -- find bounds of normalized shape
---     local minX, maxX, minY, maxY = math.huge, -math.huge, math.huge, -math.huge
---     for i = 1, #base, 2 do
---         local x = base[i]
---         local y = base[i+1]
---         if x < minX then minX = x end
---         if x > maxX then maxX = x end
---         if y < minY then minY = y end
---         if y > maxY then maxY = y end
---     end
-
---     local shapeW = maxX - minX
---     local shapeH = maxY - minY
-
---     -- scale shape to fit inside preview box
---     local scale = math.min(
---         (w * 0.8) / shapeW,
---         (h * 0.8) / shapeH
---     )
-
---     -- center inside box
---     local offsetX = x + w/2
---     local offsetY = y + h/2
-
---     -- draw background box
---     love.graphics.setColor(0.1, 0.1, 0.1, 0.4)
---     love.graphics.rectangle("fill", x, y, w, h, 8, 8)
-
---     -- draw polygon
---     love.graphics.setColor(1, 0, 0)
---     love.graphics.push()
---     love.graphics.translate(offsetX, offsetY)
---     love.graphics.scale(scale)
-
---     -- shift polygon so its center is at (0,0)
---     local cx = (minX + maxX) / 2
---     local cy = (minY + maxY) / 2
-
---     local shifted = {}
---     for i = 1, #base, 2 do
---         table.insert(shifted, base[i] - cx)
---         table.insert(shifted, base[i+1] - cy)
---     end
-
---     love.graphics.polygon("line", shifted)
-
---     love.graphics.pop()
---     love.graphics.setColor(1, 1, 1)
--- end

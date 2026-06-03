@@ -4,13 +4,15 @@ local RotVis = require("agent.glm.rotvis")
 local BallRotVis = nil
 
 function Ball:drop(x_pos, y_pos)
-    self.x = x_pos
-    self.y = y_pos
+    self.x = x_pos ~= nil and x_pos or self.spawnX
+    self.y = y_pos ~= nil and y_pos or self.spawnY
     self.needsUpdate = true
 end
 
-function Ball:load(window, world, radius)
-    self.body = love.physics.newBody(world, window.right / 2 - radius / 2, window.top, "dynamic")
+function Ball:load(world, radius, x, y)
+    self.body = love.physics.newBody(world, x, y, "dynamic")
+    self.spawnX = x
+    self.spawnY = y
     self.shape = love.physics.newCircleShape(radius)
     self.fixture = love.physics.newFixture(self.body, self.shape, 1)
     self.fixture:setRestitution(0.5)

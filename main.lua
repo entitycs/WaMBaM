@@ -1,8 +1,10 @@
 require("core.ratios")
 require("current.arena")
 require("core.utils.table")
-local Menu = require("core.state.menu")
-Arena = require("core.arena")
+local Menu = require("core.menu.controller")
+local Stage = require("current.stage")
+-- Arena = require("core.arena")
+-- local Goals = require("current.goals.container")
 local Ball = require("core.ball")
 local PlayerProto = require("player.body")
 local Player1 = {}
@@ -16,6 +18,12 @@ end
 
 local window = {}
 local world
+local H = love.graphics.getHeight()
+
+local influence = 0.9
+local smoothFactor = 0.01
+local currentCameraX = 0
+local currentCameraY = 0
 
 local reloadBall = {
     test =  function (aName, bName)
@@ -28,9 +36,11 @@ local reloadBall = {
         -- note: NOT regex
         return string.match(collider, "^Goal%d*$") ~= nil
     end ,
-    invoke = function (fixtureA, fixtureB, contact)
+    invoke = function(fixtureA, fixtureB, contact)
         Ball:drop(window.right / 2 - Ball.shape:getRadius() / 2, 30)
         love.audio.play(love.audio.newSource("audio/score.wav", "static"))
+        currentCameraX = 0--Ball.body:getX()
+        currentCameraY = 0--Ball.body:getY()
     end
 }
 
@@ -51,35 +61,44 @@ function love.load()
 
     -- Set the window size
     love.window.setMode(window.right, window.bottom)
+    
+    -- Players
+    Player1 = PlayerProto.new()
+    Player2 = PlayerProto.new()
 
     -- Create new World
     world = love.physics.newWorld(0, 90, true)
-    Menu:load(window)
     -- Set contact handling callback
-    local contactHandler = ContactHandler.new(world)
+    local contactHandler = ContactHandler.new( )
     world:setCallbacks(contactHandler.beginContact)
-
-    -- Add to contact handling callback list, post-set!
-    contactHandler:addBegin(reloadBall)
-    contactHandler:addBegin(reloadBall)
+    
+    Menu:load(window, world, {Player1, Player2}, contactHandler)
+    
+    -- Add to contact handling callback list, post-set (above)!
+    -- contactHandler:addBegin(reloadBall)
+    -- contactHandler:addBegin(reloadBall)
 
     local wheelSize = 10
 
     -- Ball
     local ballRadius = BallSize(wheelSize)
-    Ball:load(window, world, ballRadius)
+    -- new constructor removes window, adds x, y params
+    Ball:load(world, ballRadius,  window.right / 2 - ballRadius / 2, window.top)
 
-    -- Players
-    Player1 = PlayerProto.new()
-    Player2 = PlayerProto.new()
 
     Player2:load(window, world, wheelSize, contactHandler)
     Player1:load(window, world, wheelSize, contactHandler)
-    -- Arena
-    Arena:load(window, world)
+
+    -- initial stage load (subsequent loads through menu)
+    if Stage ~= nil and type(Stage.arena) == "table" then  
+        Stage.arena:load(window, world, contactHandler)
+    end
+    -- -- Arena
+    -- Arena:load(window, world)
 
     -- Per 'Round/Game' Arena
     CurrentArena:load(window, world, ballRadius)
+    -- Goals:load(window, world, ballRadius * 2)
 
     Directions = { "up", "down", "left", "right" }
     DirectionTargets = { "y", "y", "x", "x" }
@@ -101,24 +120,57 @@ function love.update(dt)
     Player2:update(dt)
 end
 
-function love.draw()
-    -- Wipe the screen
-    love.graphics.clear(0.1, 0.1, 0.12)
-    love.graphics.setColor(.5, .5, .5)
-
-    -- Draw Arena (Backdrop => first)
-    CurrentArena:draw()
-
-    -- Draw Arena
-    Arena:draw()
-
-    -- Draw player
-    Player1:draw()
-    Player2:draw()
-    -- Draw ball
-    Ball:draw()
-
-    -- Draw Menu
-    Menu:draw(window)
+local function createWorld()
 
 end
+
+function love.draw()
+    love.graphics.clear(0.1, 0.1, 0.12)
+
+    local W = window.right
+    local H = window.bottom
+
+    -- Player world position
+    local px = Player1.rear.body:getX()
+    local py = Player1.rear.body:getY()
+
+    -- Camera target: player slightly below center (Only Up style)
+    local targetCameraX = px - W * 0.5
+    local targetCameraY = py - H * 0.6   -- <--- THIS is the magic ratio
+
+    -- Smooth follow
+    currentCameraX = currentCameraX + (targetCameraX - currentCameraX) * smoothFactor * 0.1
+    currentCameraY = currentCameraY + (targetCameraY - currentCameraY) * smoothFactor
+
+    -- Only-Up threshold: 10% from top of screen
+    local topEdge = currentCameraY
+    local threshold = topEdge + H * 0.1
+
+    if py < threshold then
+        -- Smooth upward shift instead of instant jump
+        currentCameraY = currentCameraY - H * 0.5
+    end
+
+    -- Apply camera transform
+    love.graphics.push()
+    love.graphics.translate(-currentCameraX, -currentCameraY)
+
+        -- EVERYTHING in world space
+    CurrentArena:draw()
+    if Stage ~= nil and type(Stage.arena) == "table" then
+            print("stage.arena: ", Stage.arena)
+            Stage.arena:draw()
+        end
+        -- Goals:draw()
+        -- Arena:draw()
+        Player1:draw()
+        Player2:draw()
+        Ball:draw()
+
+    love.graphics.pop()
+
+    -- UI only
+    Menu:draw(window)
+end
+
+

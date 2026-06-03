@@ -6,16 +6,24 @@ local defaults = {
     drainRate = 0.25,
     regenRate = 0.5,
     cooldownDelay = 2.0,
-    draw = function(window, value)
-        love.graphics.setColor(0.2, 0.8, 0.3)
-        love.graphics.rectangle("fill",
-            window.bottom - 200,
-            window.bottom - 50,
-            100 * value,
-            30
-        )
-        love.graphics.setColor(1, 1, 1)
-    end
+draw = function(window, value)
+    love.graphics.setColor(0.2, 0.8, 0.3)
+
+    local screenW = window.right
+    local screenH = window.bottom
+
+    -- Position relative to the bottom of the *screen*, not the world
+    local barWidth = 100 * value
+    local barHeight = 30
+
+    local x = screenW - 200
+    local y = screenH - 50
+
+    love.graphics.rectangle("fill", x, y, barWidth, barHeight)
+
+    love.graphics.setColor(1, 1, 1)
+end
+
 }
 
 

@@ -25,7 +25,7 @@ function Rear:applyBraking(inputValue)
 end
 
 function Rear:releaseBraking()
-    self.body:setAngularDamping(100)
+    self.body:setAngularDamping(1000)
     self.body:setLinearDamping(0.25)
 end
 

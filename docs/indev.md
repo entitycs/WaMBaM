@@ -4,11 +4,28 @@
 
 ```mermaid
 flowchart LR
-Landing --> Game & Exit
+
+subgraph Stage
+    Tutorial
+    Default
+    Other...
+end
+
+subgraph Game[Game]
+Stage:::subg
+end
+
+Landing --> Game:::subg2 & Exit
 Game --> Paused
 Paused --> Exit & Landing & Game
 Exit --> Exit_Confirmed & Landing & Paused
+
+classDef subg fill:lightgrey
+classDef subg2 fill:#777, color:white
 ```
+
+> &nbsp;
+>**Landing / Main Menu**
 >
 >```mermaid
 >flowchart LR
@@ -24,7 +41,8 @@ Exit --> Exit_Confirmed & Landing & Paused
 >
 >State machine has no notion of Paused from this state
 >&nbsp;
-
+>
+>**Game State**
 >
 >```mermaid
 >
@@ -40,8 +58,9 @@ Exit --> Exit_Confirmed & Landing & Paused
 >
 >State Machine only knows paused state as reachable
 >&nbsp;
-
-
+>
+>**Paused State**
+>
 >```mermaid
 >flowchart LR
 >Landing --> Game & Exit:::End
@@ -56,7 +75,8 @@ Exit --> Exit_Confirmed & Landing & Paused
 >
 >Maximum # of options available when paused. Exit state has onTest defined as no-op, as there are no further states reachable. Hence `nodes = {}`, `text = {}`, `onTest = {}`. Only title and `onEnter` are useful.
 > &nbsp;
-
+>
+>**Menu Cursor**
 >
 > ```mermaid
 > flowchart TB

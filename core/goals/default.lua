@@ -79,6 +79,10 @@ function Goal:load(scoreGroup)
     self.scoreGroup = scoreGroup
 end
 
+function Goal:unload()
+    self.body:destroy()
+end
+
 function Goal:update(dt)
     -- todo: collision detection ... (see ContactHandler)
 end

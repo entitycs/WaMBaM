@@ -34,9 +34,9 @@ function BodyBoost:load(targetPlayer, forceTable)
         "wam",
         {
             value = 1.0,      -- 1 = full, 0 = empty
-            drainRate = 0.25, -- per second
+            drainRate = 5, -- per second
             regenRate = 0.25,  -- per second
-            cooldownDelay = 0.5,
+            cooldownDelay = 5,
             draw = function(window, value)
                 -- print("made it")
                 love.graphics.setColor(0.2, 0.8, 0.3)

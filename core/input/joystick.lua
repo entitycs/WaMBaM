@@ -2,7 +2,7 @@ local JoystickInput = {}
 JoystickInput.__index = JoystickInput
 
 local activeInstances = {}
-local listeners = {}
+-- local listeners = {}
 
 function love.joystickadded(js)
     for _, inst in ipairs(activeInstances) do
@@ -27,10 +27,11 @@ function JoystickInput.new(listenerList) -- should i pass in a player
     local self = setmetatable({
         lastButton = "none",
         joystick = nil,
+        listeners = {},
         -- currentAngle = { x = 0, y = 0, changed = false }
     }, JoystickInput)
     for _, listener in ipairs(listenerList) do
-        table.insert(listeners, listener)
+        table.insert(self.listeners, listener)
     end
     table.insert(activeInstances, self)
     return self
@@ -73,6 +74,7 @@ end
 function JoystickInput:update(dt)
     local limitedX = false
     local limitedY = false
+    local listeners = self.listeners
     if self.joystick == nil then
         return
     end

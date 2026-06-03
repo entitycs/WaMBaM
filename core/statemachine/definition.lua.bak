@@ -16,7 +16,8 @@ local menuOptions = love.graphics.newImage("images/MenuOptions.png", {dpiscale =
 -- Partial Definition for States
 local states = {
     previous = {
-        title = "previous"
+        title = "previous",
+        joyMap = "b",
     },
     landing = {
         title = "landing",
@@ -45,6 +46,13 @@ local states = {
         title = "paused",
         joyMap = "start",
         keyMap = "escape",
+        selected = false,
+        nodes = {}
+    },
+    tutorial = {
+        title = "tutorial",
+        joyMap = "y",
+        keyMap = "t",
         selected = false,
         nodes = {}
     },
