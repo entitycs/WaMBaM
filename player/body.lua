@@ -33,7 +33,7 @@ function Player.new()
             boostValue = 0,
             torqueValue = { x = 0, y = 0 },
             brakeReleasedThisFrame = false,
-            previousStickAngle = 0,
+            dtTriggers = {},
             inputAngularVelocity = 0,
         },
         collisionOnEnterRear = nil, -- built in :load (needs self.id)
@@ -60,7 +60,8 @@ function Player:onAxis(axisName, axisValue)
 end
 
 function Player:onTriggerRelease(triggerName)
-    InputRouter.onInput(self, triggerName, nil)
+    InputRouter.onInput(self, triggerName, 0)
+    self.dtTriggers[triggerName] = 0
 end
 
 --------------------------------------------------------------------------------
@@ -107,7 +108,7 @@ function Player:update(dt)
     self.rear:update(dt)
     self.front:update(dt)
     KeyboardInput:update(dt)
-
+    
     self.rear.body:applyLinearImpulse(
         dt * self.currentState.forceValue.x,
         dt * self.currentState.forceValue.y
@@ -119,7 +120,7 @@ function Player:update(dt)
     )
 
     -- zero out 'summed' forces after applying
-    self.currentState.boostValue = 0
+    -- self.currentState.boostValue = 0
     self.currentState.forceValue = { x = 0, y = 0 }
     self.currentState.torqueValue = { x = 0, y = 0 }
     self.currentState.brakeValue = 0

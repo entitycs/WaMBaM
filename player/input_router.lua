@@ -14,6 +14,8 @@ local TRIGGER_BRAKE = "triggerright"
 
 --------------------------------------------------------------------------------
 -- Generic input entry point used by JoystickInput listeners.
+---@param value number
+---@param name string
 --------------------------------------------------------------------------------
 function InputRouter.onInput(player, name, value)
     -- Triggers: forward to abilities, then maybe braking.
@@ -31,7 +33,7 @@ function InputRouter.onInput(player, name, value)
     -- Other triggers (boost, wamBoost) go straight to abilities.
     if name == "triggerleft" or name == "rightshoulder" then
         player.abilities:onInput(name, value)
-        return
+        -- return
     end
 
     -- Axes: cache joystick state for any future use, then apply.

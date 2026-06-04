@@ -20,9 +20,9 @@ function BodyBoost.new(targetBody, forceTable)
         targetTable = forceTable,
         cooldown = BodyBoostCooldown.new(),
         audio = AudioProto.new(),
-        currentState = {
-            boostValue = 0
-        },
+        -- currentState = {
+        --     boostValue = 0
+        -- },
     }, BodyBoost)
 
     return self
@@ -33,12 +33,13 @@ end
 --------------------------------------------------------------------------------
 function BodyBoost:load(targetPlayer, forceTable)
     self.targetPlayer = targetPlayer
+    self.targetTable = forceTable
     self.cooldown:load()
     self.cooldown:setCooldown(
         "wam",
         {
             value = 1.0,      -- 1 = full, 0 = empty
-            drainRate = 5, -- per second
+            drainRate = 0.5, -- per second
             regenRate = 0.25,  -- per second
             cooldownDelay = 5,
             draw = function(window, value)
@@ -84,9 +85,11 @@ end
 function BodyBoost:update(dt)
     -- zero out 'summed' forces after applying
     self.cooldown:update(dt)
-    self.currentState.boostValue = 0
-    self.targetTable.x = 0
-    self.targetTable.y = 0
+    print("current boost value: ", self.targetPlayer.currentState.boostValue, self.targetPlayer.id)
+    
+
+    -- self.targetTable.x = 0
+    -- self.targetTable.y = 0
 end
 
 --------------------------------------------------------------------------------
@@ -116,9 +119,8 @@ function BodyBoost:onInput(triggerName, triggerValue)
     end
 end
 
-
 function BodyBoost:applyBoost(axisName, boostValue)
-    self.targetTable.boostValue = boostValue
+    self.targetPlayer.currentState.boostValue = boostValue
 end
 
 function BodyBoost:clampTeleport(x, y)
@@ -151,7 +153,7 @@ function BodyBoost:applyVectorBoost(boostValue)
     local impulseStrength = 1
     self.targetPlayer.rear.body:applyLinearImpulse(x * impulseStrength, y * impulseStrength)
 
-    self.currentState.forceValue = diffVector
+    -- self.currentState.forceValue = diffVector
 end
 
 return BodyBoost

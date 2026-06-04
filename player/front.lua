@@ -13,7 +13,8 @@ function Front.new()
         effects = {},
         rotVis = nil,
         streaks = {},
-        rear = {}
+        rear = {},
+        brakingDt = -1
     }, Front)
     return self
 end
@@ -28,6 +29,9 @@ function Front:collisionOnEnter(fixture_a, fixture_b, contact)
 end
 
 function Front:applyBraking(inputValue)
+    if self.brakingDt == -1 then
+        self.brakingDt = 0
+    end
     self.body:setLinearDamping(25 * inputValue + 0.5)
     self.body:setAngularDamping(25 * inputValue + 0.5)
 end
@@ -35,6 +39,8 @@ end
 function Front:releaseBraking()
     self.body:setLinearDamping(3)
     self.body:setAngularDamping(1)
+    -- todo - move 'pushback force' here
+    self.brakingDt = -1
 end
 
 --------------------------------------------------------------------------------
@@ -81,7 +87,11 @@ end
 --- update
 --------------------------------------------------------------------------------
 function Front:update(dt, window, world)
-    self:releaseBraking()
+    local reboundMultiplier = 2
+    if self.brakingDt >= 0 then 
+        self.brakingDt = self.brakingDt + dt * reboundMultiplier
+    end
+    -- self:releaseBraking()
     for i = #self.effects, 1, -1 do
         local e = self.effects[i]
         e:update(dt)
@@ -99,7 +109,6 @@ function Front:update(dt, window, world)
 
     -- rear streak
     if math.abs(vel) > 400 then -- magic number
-        print("streak")
         table.insert(self.streaks,
             streakShader.new(rx, ry, angle, { 1, 0.4, 0.4 })
         )

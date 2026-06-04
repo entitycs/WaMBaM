@@ -1,4 +1,4 @@
-BodyBoost = require("player.abilities.boost")
+local BodyBoostProto = require("player.abilities.boost")
 local Abilities = {}
 Abilities.__index = Abilities
 
@@ -26,9 +26,11 @@ end
 --------------------------------------------------------------------------------
 function Abilities:load(window, player)
     self.window = window
-    self.player = player
-    self.boost = BodyBoost.new()
-    self.boost:load(player, player.currentState)
+    self.player = player 
+    self.boost = BodyBoostProto.new()
+    print("current boost value 2: ", player.currentState.boostValue)
+
+    self.boost:load(self.player, self.player.currentState)
 end
 
 --------------------------------------------------------------------------------

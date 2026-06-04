@@ -145,7 +145,6 @@ function love.draw()
     -- EVERYTHING in world space
     CurrentArena:draw()
     if Stage ~= nil and type(Stage.arena) == "table" then
-        print("stage.arena: ", Stage.arena)
         Stage.arena:draw()
     end
 

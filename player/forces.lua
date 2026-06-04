@@ -34,6 +34,7 @@ end
 -- torqueX from forceValue.x) with the same 0.95 magic number.
 --------------------------------------------------------------------------------
 function Forces.applyAcceleration(player, axisName, accelerationValue, limitingVel)
+    print("current boost value 0: ", player.currentState.boostValue, player.id)
     limitingVel = limitingVel or DEFAULT_LIMITING_VEL
     local limitedX, limitedY = Forces.checkLimits(player, "rear", limitingVel)
     local xForce = player.currentState.forceValue.x
@@ -60,6 +61,7 @@ function Forces.applyAcceleration(player, axisName, accelerationValue, limitingV
         player.currentState.torqueValue.x = 1 + player.front.torque * accelerationValue
         player.currentState.forceValue.x = player.currentState.forceValue.x - 0.95 * player.currentState.torqueValue.x
     end
+    player.currentState.boostValue = 0
 end
 
 --------------------------------------------------------------------------------
@@ -73,13 +75,16 @@ function Forces.applyBraking(player, brakeValue)
         player.front:applyBraking(brakeValue)
         player.rear:applyBraking(brakeValue)               -- note, may still be a no-op
     elseif player.currentState.brakeReleasedThisFrame then -- onTriggerRelease(triggerright)
+        local heldDt = player.front.brakingDt
+        heldDt = heldDt > 0 and heldDt or 1
         -- average out front and back velocities over the frame following braking
         player.front:releaseBraking()
         player.rear:releaseBraking()
         local newx, newy = player.rear.body:getLinearVelocity()
         local newx2, newy2 = player.front.body:getLinearVelocity()
-        player.rear.body:setLinearVelocity((newx + newx2) / 2, (newy + newy2) / 2)
-        player.front.body:setLinearVelocity((newx + newx2) / 2, (newy + newy2) / 2)
+        local resx, resy = 0.5 * (newx + newx2), 0.5 * (newy + newy2)
+        player.rear.body:setLinearVelocity(resx * heldDt, resy * heldDt)
+        player.front.body:setLinearVelocity(resx * heldDt, resy * heldDt)
         player.currentState.brakeReleasedThisFrame = false
     end
 end

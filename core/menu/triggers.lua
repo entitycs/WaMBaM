@@ -66,7 +66,6 @@ return function(states)
         tutorial = {
             onTest = { function()
                 for k, v in pairs(states.tutorial.nodes) do
-                    print("num nodes: ", #states.tutorial.nodes)
                     if checkConsumeInput(v) then
                         return k
                     end
@@ -87,7 +86,6 @@ return function(states)
                 -- resume
                 function()
                     for k, v in pairs(states.paused.nodes) do
-                        print("num nodes: ", #states.paused.nodes)
                         if checkConsumeInput(v) then
                             return k
                         end
@@ -102,9 +100,8 @@ return function(states)
 
         confirmExit = {
             onTest = { function()
-                print("num nodes: ", #states.confirmExit.nodes)
                 for k, v in pairs(states.confirmExit.nodes) do
-                    print ("node: ", v.title)
+                    print("node: ", v.title)
                     if checkConsumeInput(v) then
                         return k
                     end
