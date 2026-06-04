@@ -52,7 +52,9 @@ function Goal.getPoints(ballSize, flip)
     return points
 end
 
-
+--------------------------------------------------------------------------------
+--- new
+--------------------------------------------------------------------------------
 function Goal.new(world, ballSize, posX, posY, flip)
     -- New dimensions for vertical goal
 
@@ -99,14 +101,27 @@ function Goal.new(world, ballSize, posX, posY, flip)
     }, Goal)
 end
 
+--------------------------------------------------------------------------------
+--- load
+--------------------------------------------------------------------------------
 function Goal:load(scoreGroup)
     self.scoreGroup = scoreGroup
 end
 
+function Goal:unload()
+    self.body:destroy()
+end
+
+--------------------------------------------------------------------------------
+--- update
+--------------------------------------------------------------------------------
 function Goal:update(dt)
     -- todo: collision detection ... (see ContactHandler)
 end
 
+--------------------------------------------------------------------------------
+--- draw
+--------------------------------------------------------------------------------
 function Goal:draw()
     love.graphics.setColor(255, 0, 0)
     love.graphics.polygon("fill", self.body:getWorldPoints(self.shape:getPoints()))
@@ -123,11 +138,5 @@ function Goal:draw()
     love.graphics.setColor(1, 1, 1)
     love.graphics.setLineWidth(1)
 end
-
-
-function Goal:unload()
-    self.body:destroy()
-end
-
 
 return Goal

@@ -14,7 +14,7 @@ function love.joystickadded(js)
 end
 
 function love.gamepadpressed(js, button)
-    print("gamepad id: "..js:getID() .. "button: "..button)
+    print("gamepad id: " .. js:getID() .. "button: " .. button)
     for _, inst in ipairs(activeInstances) do
         if inst.joystick == js then
             inst.lastButton = button
@@ -23,6 +23,19 @@ function love.gamepadpressed(js, button)
     end
 end
 
+function JoystickInput.consumeButton(button)
+    for _, inst in ipairs(activeInstances) do
+        if inst.lastButton == button then
+            inst.lastButton = "none"
+            return true
+        end
+    end
+    return false
+end
+
+--------------------------------------------------------------------------------
+--- new
+--------------------------------------------------------------------------------
 function JoystickInput.new(listenerList) -- should i pass in a player
     local self = setmetatable({
         lastButton = "none",
@@ -37,21 +50,14 @@ function JoystickInput.new(listenerList) -- should i pass in a player
     return self
 end
 
-function JoystickInput.consumeButton(button)
-    for _, inst in ipairs(activeInstances) do
-        if inst.lastButton == button then
-            inst.lastButton = "none"
-            return true
-        end
-    end
-    return false
-end
 
+--------------------------------------------------------------------------------
+--- load
+--------------------------------------------------------------------------------
 function JoystickInput:load(rear, front, limitingVel)
     self.rear = rear
     self.front = front
     self.limitingVel = limitingVel
-    -- self.currentAngle = { x = 0, y = 0, changed = false }
 
     -- Try to find an unassigned joystick
     local joysticks = love.joystick.getJoysticks()
@@ -71,6 +77,9 @@ function JoystickInput:load(rear, front, limitingVel)
     end
 end
 
+--------------------------------------------------------------------------------
+--- update
+--------------------------------------------------------------------------------
 function JoystickInput:update(dt)
     local limitedX = false
     local limitedY = false
@@ -111,6 +120,9 @@ function JoystickInput:update(dt)
 
 end
 
+--------------------------------------------------------------------------------
+--- draw
+--------------------------------------------------------------------------------
 function JoystickInput:draw()
     local joysticks = love.joystick.getJoysticks()
     if self.joystick ~= nil then

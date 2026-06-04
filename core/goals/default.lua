@@ -39,7 +39,9 @@ function Goal.getPoints(ballSize, flip)
     return points, openEdges
 end
 
-
+--------------------------------------------------------------------------------
+--- new
+--------------------------------------------------------------------------------
 function Goal.new(world, ballSize, posX, posY, flip)
     local body = love.physics.newBody(world, posX, posY, "static")
     local points, _ = Goal.getPoints(ballSize, flip)
@@ -75,6 +77,9 @@ function Goal.new(world, ballSize, posX, posY, flip)
     }, Goal)
 end
 
+--------------------------------------------------------------------------------
+--- load
+--------------------------------------------------------------------------------
 function Goal:load(scoreGroup)
     self.scoreGroup = scoreGroup
 end
@@ -83,6 +88,9 @@ function Goal:unload()
     self.body:destroy()
 end
 
+--------------------------------------------------------------------------------
+--- update
+--------------------------------------------------------------------------------
 function Goal:update(dt)
     -- todo: collision detection ... (see ContactHandler)
 end

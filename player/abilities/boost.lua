@@ -10,7 +10,9 @@ local inputMap = {
     wamBoost = "rightshoulder",
 }
 
-
+--------------------------------------------------------------------------------
+--- new
+--------------------------------------------------------------------------------
 function BodyBoost.new(targetBody, forceTable)
     -- local JoyInput = JoystickInputProto.new()
     local self = setmetatable({
@@ -26,7 +28,9 @@ function BodyBoost.new(targetBody, forceTable)
     return self
 end
 
-
+--------------------------------------------------------------------------------
+--- load
+--------------------------------------------------------------------------------
 function BodyBoost:load(targetPlayer, forceTable)
     self.targetPlayer = targetPlayer
     self.cooldown:load()
@@ -74,7 +78,9 @@ function BodyBoost:load(targetPlayer, forceTable)
     self.targetTable = forceTable
 end
 
-
+--------------------------------------------------------------------------------
+--- update
+--------------------------------------------------------------------------------
 function BodyBoost:update(dt)
     -- zero out 'summed' forces after applying
     self.cooldown:update(dt)
@@ -83,7 +89,9 @@ function BodyBoost:update(dt)
     self.targetTable.y = 0
 end
 
-
+--------------------------------------------------------------------------------
+--- draw
+--------------------------------------------------------------------------------
 function BodyBoost:draw(window)
     self.window = window
     self.cooldown:draw(window)
@@ -111,24 +119,6 @@ end
 
 function BodyBoost:applyBoost(axisName, boostValue)
     self.targetTable.boostValue = boostValue
-    -- local xForce = self.targetTable.x
-    -- local yForce = self.targetTable.y
-    
-    -- -- local totalForce = self.targetTable
-    -- -- edits passed-in tables (warning)
-    -- -- if axisName == inputMap.forceX then --and not limitedX then
-    -- print("(applyBoost) boosting ", self.targetTable.x, self.targetTable.y)
-    --     -- local totalForce = self.targetTable
-    
-    -- self.targetTable.x = math.max(1, math.min(10,xForce)) * (1 + boostValue)
-    -- self.targetTable.y = math.max(1, math.min(10,yForce)) * (1 + boostValue)
-    -- -- elseif axisName == inputMap.forceY then --and not limitedY then
-    -- -- totalForce.y = yForce * (1 + boostValue)
-    -- -- end
-    -- self.targetPlayer.rear.body:applyLinearImpulse(self.targetTable.x , self.targetTable.y)
-    -- self.currentState.boostValue = 0
-    -- self.targetTable.x = 0
-    -- self.targetTable.y = 0
 end
 
 function BodyBoost:clampTeleport(x, y)
@@ -160,8 +150,6 @@ function BodyBoost:applyVectorBoost(boostValue)
     )
     local impulseStrength = 1
     self.targetPlayer.rear.body:applyLinearImpulse(x * impulseStrength, y * impulseStrength)
-
-    -- print(diffVector.x .. ", " .. diffVector.y)
 
     self.currentState.forceValue = diffVector
 end

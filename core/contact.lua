@@ -5,24 +5,6 @@ local ContactHandler = {
 }
 ContactHandler.__index = ContactHandler
 
-
--- Add Begin callback
----@param handler table 
-function ContactHandler:addBegin( handler)
-    table.insert(self.handlers.begin, { handler = handler })
-end
-
-
--- Remove Begin callback
-function ContactHandler:removeBegin(handler)
-    for i = #self.handlers.begin, 1, -1 do
-        if self.handlers.begin[i].handler == handler then
-            table.remove(self.handlers.begin, i)
-            break
-        end
-    end
-end
-
 --------------------------------------------------------------------------------
 --- new
 --------------------------------------------------------------------------------
@@ -52,5 +34,20 @@ function ContactHandler.new()
     }, ContactHandler)
 end
 
+-- Add Begin callback
+---@param handler table
+function ContactHandler:addBegin(handler)
+    table.insert(self.handlers.begin, { handler = handler })
+end
+
+-- Remove Begin callback
+function ContactHandler:removeBegin(handler)
+    for i = #self.handlers.begin, 1, -1 do
+        if self.handlers.begin[i].handler == handler then
+            table.remove(self.handlers.begin, i)
+            break
+        end
+    end
+end
 
 return ContactHandler

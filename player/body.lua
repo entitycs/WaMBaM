@@ -21,7 +21,9 @@ local inputMap = {
     wamBoost = "rightshoulder",
 }
 
-
+--------------------------------------------------------------------------------
+--- new
+--------------------------------------------------------------------------------
 function Player.new()
     -- local JoyInput = JoystickInputProto.new()
     local self = setmetatable({
@@ -82,127 +84,6 @@ function Player.new()
     return self
 end
 
-function Player:load(window, world, wheelSize, contactHandler)
-    -- load body parts
-    self.window = window
-    self.rear:load(window, world, self.front, wheelSize, self.id)
-    self.front:load(window, world, self.rear, contactHandler, self.id)
-    local center = {}
-    center.joint = love.physics.newDistanceJoint(
-        self.rear.body, self.front.body,
-        self.rear.body:getX(), self.front.body:getY(),
-        self.front.body:getX(), self.front.body:getY(),
-        false -- do not collide with each other
-    )
-    -- experimental
-    self.motor = love.physics.newMotorJoint(self.rear.body, self.front.body, 1)
-
-    -- load body inputs
-    KeyboardInput:load(self.rear, self.front, limitingVel)
-    self.joystickInput = JoystickInputProto.new({ self }) -- todo make a bodyForceHandler?
-    self.joystickInput:load(self.rear, self.front, limitingVel)
-    -- todo, pass playercount, then attempt fallback controller if > available controllers/inputs
-    -- abilities
-    self.abilities:load(window, self)
-
-
-    -- load audio for collisions
-    self.audio:load({ wam = "audio/wam.wav", bam = "audio/bam.wav", score = "audio/score.wav" })
-    -- add audio collision handlers
-    contactHandler:addBegin(self.collisionOnEnterRear)
-    contactHandler:addBegin(self.collisionOnEnterFront)
-    -- inc for next player ID
-    playerCount = playerCount + 1
-end
-
-function Player:update(dt)
-    self.joystickInput:update(dt)
-    self.abilities:update(dt)
-    self.rear:update(dt)
-    self.front:update(dt)
-    KeyboardInput:update(dt)
-
-
-    local rx, ry = self.rear.body:getPosition()
-    local fx, fy = self.front.body:getPosition()
-    local sx, sy = math.abs(rx - fx), math.abs(ry - fy)
-    local rquad = 1
-
-    -- -- check quadrant
-    -- if self.joystickInput.joystick ~= nil then
-    --     self.motor:setLinearOffset(
-    --         50 * self.joystickInput.joystick:getGamepadAxis("rightx"),
-    --         50 * self.joystickInput.joystick:getGamepadAxis("righty")
-    --     )
-    -- end
-    -- -- if true then return end
-    -- if fx > rx then
-    --     if fy < ry then
-    --         rquad = 2
-    --     end
-    -- elseif fy < ry then
-    --     rquad = 4
-    -- else
-    --     rquad = 3
-    -- end
-
-
-    -- local rotDir = 0
-    -- if sx > 0.1 then
-    --     rotDir = 1 -- right = clockwise
-    -- elseif sx < -0.1 then
-    --     rotDir = 1 -- left = counter-clockwise
-    -- end
-
-
-
-    self.rear.body:applyLinearImpulse(
-        dt * self.currentState.forceValue.x,
-        dt * self.currentState.forceValue.y
-    )
-
-    self.front.body:applyLinearImpulse(
-        dt * self.currentState.torqueValue.x,
-        dt * self.currentState.torqueValue.y
-    )
-
-    -- zero out 'summed' forces after applying
-    self.currentState.boostValue = 0
-    self.currentState.forceValue = { x = 0, y = 0 }
-    self.currentState.torqueValue = { x = 0, y = 0 }
-    self.currentState.brakeValue = 0
-    -- self.currentState.inputAngularVelocity = 0
-    -- self.currentState.previousStickAngle =
-end
-
-function Player:draw()
-    -- Draw rear wheel
-    self.rear:draw()
-    -- Draw Front Wheel
-    self.front:draw()
-    -- Draw the line between them
-    love.graphics.setColor(1, 1, 0.4)
-    love.graphics.setLineWidth(3)
-    love.graphics.line(
-        self.rear.body:getX(), self.rear.body:getY(),
-        self.front.body:getX(), self.front.body:getY()
-    )
-
-    -- for debugging
-    local curVel_x, curVel_y = self.rear.body:getLinearVelocity()
-    local angVel = self.rear.body:getAngularVelocity()
-    love.graphics.print("LinearVelocity: " .. curVel_x + curVel_y, 200 * self.id, 120)
-    love.graphics.print("AngularVelocity: " .. angVel, 200 * self.id, 140)
-    love.graphics.push()   -- save world transform
-    love.graphics.origin() -- reset to screen space (no camera transform)
-    self.joystickInput:draw()
-    self.abilities:draw(self.window)
-    love.graphics.pop()
-end
-
-local collisionOnEnter = {
-}
-
 function Player:collisionOnEnter(fixture_a, fixture_b, contact)
     love.audio.play(self.audio[fixture_a])
 end
@@ -210,22 +91,12 @@ end
 -- callbacks from InputHandler (ie. Joystick)
 function Player:onTrigger(triggerName, triggerValue)
     self.abilities:onInput(triggerName, triggerValue)
-    -- if triggerName == inputMap.wamBoost then
-    --     if self.boost:onLance(triggerValue) then
-    --         self:applyVectorBoost(2 * triggerValue)
-    --     end
     if triggerName == inputMap.braking then
-        --elseif triggerName == inputMap.braking then
         self:applyBraking(triggerValue)
-        -- elseif triggerName == inputMap.boost then
-        --     if self.boost:onWam(triggerValue) then
-        --         self:applyBoost(4 * triggerValue)
-        --     end
     end
 end
 
 function Player:onTriggerRelease(triggerName)
-
 end
 
 function Player:onAxis(axisName, axisValue)
@@ -286,42 +157,15 @@ function Player:applyAcceleration(axisName, accelerationValue)
     self.currentState.forceValue.x = xForce
     self.currentState.forceValue.y = yForce
 
-
-    -- new idea: for increased ease of usability in 'swiping'
-    -- measure dx, dy for front vs rear.  if dy > dx, ignore y 'torque'
-    -- and vice versa.
-    local rx, ry = self.rear.body:getX(), self.rear.body:getY()
-    local fx, fy = self.front.body:getX(), self.front.body:getY()
-    local dx, dy = math.abs(rx - fx), math.abs(ry - fy)
-
-    -- if ry <= fy then return end
-
-
-    -- lets try w/ and w/out limits for torque
     limitedX, limitedY = self:checkLimits("front", limitingVel * 2.15) -- magic number
     if axisName == inputMap.torqueY and not limitedY then
-        -- if dx >= dy
-        -- or (accelerationValue > 0 and fy > ry)
-        -- or (accelerationValue < 0 and fy < ry) then
         self.currentState.torqueValue.y = 1 + self.front.torque * accelerationValue
         self.currentState.forceValue.y = self.currentState.forceValue.y - 0.95 * self.currentState.torqueValue.y
-        -- end
     elseif axisName == inputMap.torqueX and not limitedX then
-        -- if dy >= dx
-        --     or (accelerationValue > 0 and fx > rx)
-        --     or (accelerationValue < 0 and fx < rx)
-        -- then+-++
-
         self.currentState.torqueValue.x = 1 + self.front.torque * accelerationValue
         self.currentState.forceValue.x = self.currentState.forceValue.x - 0.95 * self.currentState.torqueValue.x
-        -- self.front.body:applyLinearImpulse(self.currentAngle.impulse, 0)
-        -- end
     end
 end
-
--- function Player:applyBoost(boostValue)
---     self.currentState.boostValue = boostValue
--- end
 
 function Player:clampTeleport(x, y)
     local minX, minY = 10, 10
@@ -333,29 +177,102 @@ function Player:clampTeleport(x, y)
     return x, y
 end
 
--- function Player:applyVectorBoost(boostValue)
---     -- find vector representing wam-facing direction (front to rear ->)
---     local x, y = self.rear.body:getX() - self.front.body:getX(),
---         self.rear.body:getY() - self.front.body:getY()
---     local diffVector = { x = x, y = y }
---     -- normalize 'vector'
---     local length = math.sqrt(diffVector.x * diffVector.x + diffVector.y * diffVector.y)
---     if length ~= 0 then
---         diffVector.x = diffVector.x / length
---         diffVector.y = diffVector.y / length
---     end
---     self.rear.body:setPosition(
---         self:clampTeleport(
---             self.rear.body:getX() + diffVector.x * 2,
---             self.rear.body:getY() + diffVector.y * 2
---         )
---     )
---     local impulseStrength = 1
---     self.rear.body:applyLinearImpulse(x * impulseStrength, y * impulseStrength)
+--------------------------------------------------------------------------------
+--- load
+--------------------------------------------------------------------------------
+function Player:load(window, world, wheelSize, contactHandler)
+    -- load body parts
+    self.window = window
+    self.rear:load(window, world, self.front, wheelSize, self.id)
+    self.front:load(window, world, self.rear, contactHandler, self.id)
+    local center = {}
+    center.joint = love.physics.newDistanceJoint(
+        self.rear.body, self.front.body,
+        self.rear.body:getX(), self.front.body:getY(),
+        self.front.body:getX(), self.front.body:getY(),
+        false -- do not collide with each other
+    )
+    -- experimental
+    self.motor = love.physics.newMotorJoint(self.rear.body, self.front.body, 1)
 
---     -- print(diffVector.x .. ", " .. diffVector.y)
+    -- load body inputs
+    KeyboardInput:load(self.rear, self.front, limitingVel)
+    self.joystickInput = JoystickInputProto.new({ self }) -- todo make a bodyForceHandler?
+    self.joystickInput:load(self.rear, self.front, limitingVel)
+    -- todo, pass playercount, then attempt fallback controller if > available controllers/inputs
+    -- abilities
+    self.abilities:load(window, self)
 
---     self.currentState.forceValue = diffVector
--- end
+    -- load audio for collisions
+    self.audio:load({ wam = "audio/wam.wav", bam = "audio/bam.wav", score = "audio/score.wav" })
+    -- add audio collision handlers
+    contactHandler:addBegin(self.collisionOnEnterRear)
+    contactHandler:addBegin(self.collisionOnEnterFront)
+    -- inc for next player ID
+    playerCount = playerCount + 1
+end
+
+--------------------------------------------------------------------------------
+--- update
+--------------------------------------------------------------------------------
+function Player:update(dt)
+    self.joystickInput:update(dt)
+    self.abilities:update(dt)
+    self.rear:update(dt)
+    self.front:update(dt)
+    KeyboardInput:update(dt)
+
+    local rx, ry = self.rear.body:getPosition()
+    local fx, fy = self.front.body:getPosition()
+    local sx, sy = math.abs(rx - fx), math.abs(ry - fy)
+    local rquad = 1
+
+    self.rear.body:applyLinearImpulse(
+        dt * self.currentState.forceValue.x,
+        dt * self.currentState.forceValue.y
+    )
+
+    self.front.body:applyLinearImpulse(
+        dt * self.currentState.torqueValue.x,
+        dt * self.currentState.torqueValue.y
+    )
+
+    -- zero out 'summed' forces after applying
+    self.currentState.boostValue = 0
+    self.currentState.forceValue = { x = 0, y = 0 }
+    self.currentState.torqueValue = { x = 0, y = 0 }
+    self.currentState.brakeValue = 0
+end
+
+--------------------------------------------------------------------------------
+--- draw
+--------------------------------------------------------------------------------
+function Player:draw()
+    -- Draw rear wheel
+    self.rear:draw()
+    -- Draw Front Wheel
+    self.front:draw()
+    -- Draw the line between them
+    love.graphics.setColor(1, 1, 0.4)
+    love.graphics.setLineWidth(3)
+    love.graphics.line(
+        self.rear.body:getX(), self.rear.body:getY(),
+        self.front.body:getX(), self.front.body:getY()
+    )
+
+    -- for debugging
+    local curVel_x, curVel_y = self.rear.body:getLinearVelocity()
+    local angVel = self.rear.body:getAngularVelocity()
+    love.graphics.print("LinearVelocity: " .. curVel_x + curVel_y, 200 * self.id, 120)
+    love.graphics.print("AngularVelocity: " .. angVel, 200 * self.id, 140)
+    love.graphics.push()   -- save world transform
+    love.graphics.origin() -- reset to screen space (no camera transform)
+    self.joystickInput:draw()
+    self.abilities:draw(self.window)
+    love.graphics.pop()
+end
+
+local collisionOnEnter = {
+}
 
 return Player

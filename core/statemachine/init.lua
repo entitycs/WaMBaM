@@ -44,13 +44,6 @@ function StateMachine:cursorReset()
     self.state.nodes[1].selected = true
 end
 
---------------------------------------------------------------------------------
---- load (& reload)
--------------------------------------------------------------------------------- 
-function StateMachine:load(newState)
-    self.state = newState
-    self:cursorReset()
-end
 
 function StateMachine:onTest()
     -- print("StateMachine:onTest 1", self.state.trigger.onTest)
@@ -67,6 +60,13 @@ function StateMachine:onTest()
         end
     end
     return 0, self.state
+end
+--------------------------------------------------------------------------------
+--- load (& reload)
+-------------------------------------------------------------------------------- 
+function StateMachine:load(newState)
+    self.state = newState
+    self:cursorReset()
 end
 
 return StateMachine

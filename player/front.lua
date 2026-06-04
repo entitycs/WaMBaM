@@ -5,7 +5,9 @@ local Shockwave = require("agent.copilot.shaders.shockwave")
 local RotVis = require("agent.glm.rotvis")
 local streakShader = require("agent.copilot.shaders.streakshader")
 
-
+--------------------------------------------------------------------------------
+--- new
+--------------------------------------------------------------------------------
 function Front.new()
     local self = setmetatable({
         effects = {},
@@ -35,6 +37,9 @@ function Front:releaseBraking()
     self.body:setAngularDamping(1)
 end
 
+--------------------------------------------------------------------------------
+--- load
+--------------------------------------------------------------------------------
 function Front:load(window, world, rear, contactHandler, playerCount)
     self.size = rear.size
     local wheelbase = self.size * 6
@@ -72,6 +77,9 @@ function Front:load(window, world, rear, contactHandler, playerCount)
     self.rear = rear
 end
 
+--------------------------------------------------------------------------------
+--- update
+--------------------------------------------------------------------------------
 function Front:update(dt, window, world)
     self:releaseBraking()
     for i = #self.effects, 1, -1 do
@@ -82,14 +90,12 @@ function Front:update(dt, window, world)
         end
     end
     local vel = self.body:getLinearVelocity()
-    -- local frontAngVel = self.front.body:getAngularVelocity()
 
     local angle = math.atan(
         self.body:getY() - self.rear.body:getY(),
         self.body:getX() - self.rear.body:getX()
     )
     local rx, ry     = self.body:getPosition()
-    -- local fx, fy = self.front.body:getPosition()
 
     -- rear streak
     if math.abs(vel) > 400 then -- magic number
@@ -108,6 +114,9 @@ function Front:update(dt, window, world)
     end
 end
 
+--------------------------------------------------------------------------------
+--- draw
+--------------------------------------------------------------------------------
 function Front:draw()
     love.graphics.setColor(0.4, 1, 0.4)
     for _, s in ipairs(self.streaks) do

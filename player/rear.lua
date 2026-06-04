@@ -4,6 +4,9 @@ Rear.__index = Rear
 
 local RotVis = require("agent.glm.rotvis")
 
+--------------------------------------------------------------------------------
+--- new
+--------------------------------------------------------------------------------
 function Rear.new()
     local self = setmetatable({
         rotVis = nil,
@@ -13,12 +16,10 @@ function Rear.new()
     return self
 end
 
-
 function Rear:drop(x_pos, y_pos)
     self.x = math.abs(x_pos)
     self.y = math.abs(y_pos)
 end
-
 
 function Rear:applyBraking(inputValue)
 
@@ -29,7 +30,9 @@ function Rear:releaseBraking()
     self.body:setLinearDamping(0.25)
 end
 
-
+--------------------------------------------------------------------------------
+--- load
+--------------------------------------------------------------------------------
 function Rear:load(window, world, front, size, playerCount)
     self.x = 100
     self.y = 0
@@ -50,6 +53,9 @@ function Rear:load(window, world, front, size, playerCount)
     streakShader:load()
 end
 
+--------------------------------------------------------------------------------
+--- update
+--------------------------------------------------------------------------------
 function Rear:update(dt)
 
     local vel  = self.body:getLinearVelocity()
@@ -77,6 +83,9 @@ function Rear:update(dt)
 
 end
 
+--------------------------------------------------------------------------------
+--- draw
+--------------------------------------------------------------------------------
 function Rear:draw()
     love.graphics.setColor(1, 0.4, 0.4)
     -- draw streaks first (behind)
