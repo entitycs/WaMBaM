@@ -1,0 +1,4 @@
+local PlayerManager = {}
+
+
+return PlayerManager
