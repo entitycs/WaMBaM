@@ -1,81 +1,136 @@
 require("core.ratios")
 require("current.arena")
 require("core.utils.table")
+-- local Menu = require("core.menu.controller")
 local Arena = require("core.tutorial_arena")
--- local Goals = require("current.goals.container")
--- local Ball = require("core.ball")
--- local PlayerProto = require("player.body")
+local Goals = require("current.goals.container")
+local Ball = require("core.ball")
+local PlayerProto = require("player.body")
 local Player1 = {}
--- local Player2 = {}
+local Player2 = {}
 
-local Tutorial = {
+local ContactHandler = require("core.contact")
+
+local TutorialStage = {
     window = {},
     world = {}
 }
- --------------------------------------------------------------
 
-local H = love.graphics.getHeight()
-
+ 
 local influence = 0.9
 local smoothFactor = 0.01
 local currentCameraX = 0
 local currentCameraY = 0
 
+local reloadBall = {
+    test =  function (aName, bName)
+        local names = { aName, bName }
+        if not Pop(names, "Ball") then
+            return false
+        end
+        local collider = names[1]
+        if not collider then return false end
+        -- note: NOT regex
+        return string.match(collider, "^Goal%d*$") ~= nil
+    end ,
+    invoke = function(fixtureA, fixtureB, contact)
+        Ball:drop(nil, 30)
+        love.audio.play(love.audio.newSource("audio/score.wav", "static"))
+        currentCameraX = 0--Ball.body:getX()
+        currentCameraY = 0--Ball.body:getY()
+    end
+}
  
--- local limitingVel = 400
-function Tutorial:load(window, world, players, contactHandler)
- 
-    if window ~= nil then self.window = window end
-    if world ~= nil then self.world = world end
-    if players ~= nil then self.players = players end
 
-    self.right = window.right
-    self.bottom = window.bottom
-    window = window
+local center = {} -- connector
+ 
+
+
+--------------------------------------------------------------------------------
+--- load
+--------------------------------------------------------------------------------
+function TutorialStage:load(window, world, players, contactHandler)
+    self.window = window
+    self.world = world
+    love.physics.setMeter(64)
+    self.window.left = 0
+    self.window.top = 0
+    self.window.right = 1200
+    self.window.bottom = 600
+
+    -- -- Set the window size
+    -- love.window.setMode(self.window.right, self.window.bottom)
+
     -- Create new World
     -- world = love.physics.newWorld(0, 90, true)
+    -- Menu:load(self.window, self.world)
     -- Set contact handling callback
+
+    -- Add to contact handling callback list, post-set!
+    contactHandler:addBegin(reloadBall)
 
     local wheelSize = 10
 
-    -- Ball
+    -- -- Ball
     local ballRadius = BallSize(wheelSize)
- 
-    -- Players
-    Player1 = self.players[1]-- PlayerProto.new()
- 
+    -- Ball:load(self.window, self.world, ballRadius)
+
+    -- -- Players
+    Player1 = players[1]--PlayerProto.new()
+    Player2 = players[2]--PlayerProto.new()
+
+    -- Player2:load(window, world, wheelSize, contactHandler)
     -- Player1:load(window, world, wheelSize, contactHandler)
     -- Arena
     Arena:load(window, world)
 
     -- Per 'Round/Game' Arena
     CurrentArena:load(window, world, ballRadius)
- 
+    Goals:load(window, world, ballRadius * 2)
+
     Directions = { "up", "down", "left", "right" }
     DirectionTargets = { "y", "y", "x", "x" }
 end
 
-
-function Tutorial:unload()
+function TutorialStage:unload()
+    Goals:unload()
     Arena:unload()
+    ContactHandler:removeBegin(reloadBall)
 end
-
-
-function Tutorial:update(dt)
+--------------------------------------------------------------------------------
+--- update
+--------------------------------------------------------------------------------
+function TutorialStage:update(dt)
     
-    Player1:update(dt)
- 
+    -- local isResume = Menu:update(dt)
+    
+    -- if not isResume then return end
+    
+    -- update world
+    self.world:update(dt)
+
+    -- update ball
+    -- Ball:update(dt)
+
+    -- Player1:update(dt)
+    -- Player2:update(dt)
 end
 
- 
+local function createWorld()
 
-function Tutorial:draw()
+end
+
+
+--------------------------------------------------------------------------------
+--- draw
+--------------------------------------------------------------------------------
+function TutorialStage:draw()
     love.graphics.clear(0.1, 0.1, 0.12)
 
-    local W = self.right
-    local H = self.bottom
+    local W = self.window.right
+    local H = self.window.bottom
 
-    -- Player world position
+    -- -- Player world position
     local px = Player1.rear.body:getX()
     local py = Player1.rear.body:getY()
 
@@ -102,13 +157,16 @@ function Tutorial:draw()
 
         -- EVERYTHING in world space
         CurrentArena:draw()
- 
-        -- Arena:draw()
         -- Player1:draw()
- 
-
+        -- Player2:draw()
+        -- Ball:draw()
+     
     love.graphics.pop()
+    Goals:draw()
+    Arena:draw()
+
+    -- UI only
+    -- Menu:draw(self.window)
 end
 
-return Tutorial
-
+return TutorialStage

@@ -152,8 +152,8 @@ function love.draw()
     end
 
     -- Apply camera transform
-    love.graphics.push()
-    love.graphics.translate(-currentCameraX, -currentCameraY)
+    -- love.graphics.push()
+    -- love.graphics.translate(-currentCameraX, -currentCameraY)
 
         -- EVERYTHING in world space
     CurrentArena:draw()
@@ -167,7 +167,7 @@ function love.draw()
         Player2:draw()
         Ball:draw()
 
-    love.graphics.pop()
+    -- love.graphics.pop()
 
     -- UI only
     Menu:draw(window)

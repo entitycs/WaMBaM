@@ -127,33 +127,33 @@ end
 function DefaultStage:draw()
     love.graphics.clear(0.1, 0.1, 0.12)
 
-    local W = self.window.right
-    local H = self.window.bottom
+    -- local W = self.window.right
+    -- local H = self.window.bottom
 
-    -- -- Player world position
-    local px = Player1.rear.body:getX()
-    local py = Player1.rear.body:getY()
+    -- -- -- Player world position
+    -- local px = Player1.rear.body:getX()
+    -- local py = Player1.rear.body:getY()
 
-    -- Camera target: player slightly below center (Only Up style)
-    local targetCameraX = px - W * 0.5
-    local targetCameraY = py - H * 0.6   -- <--- THIS is the magic ratio
+    -- -- Camera target: player slightly below center (Only Up style)
+    -- local targetCameraX = px - W * 0.5
+    -- local targetCameraY = py - H * 0.6   -- <--- THIS is the magic ratio
 
-    -- Smooth follow
-    currentCameraX = currentCameraX + (targetCameraX - currentCameraX) * smoothFactor * 0.1
-    currentCameraY = currentCameraY + (targetCameraY - currentCameraY) * smoothFactor
+    -- -- Smooth follow
+    -- currentCameraX = currentCameraX + (targetCameraX - currentCameraX) * smoothFactor * 0.1
+    -- currentCameraY = currentCameraY + (targetCameraY - currentCameraY) * smoothFactor
 
-    -- Only-Up threshold: 10% from top of screen
-    local topEdge = currentCameraY
-    local threshold = topEdge + H * 0.1
+    -- -- Only-Up threshold: 10% from top of screen
+    -- local topEdge = currentCameraY
+    -- local threshold = topEdge + H * 0.1
 
-    if py < threshold then
-        -- Smooth upward shift instead of instant jump
-        currentCameraY = currentCameraY - H * 0.5
-    end
+    -- if py < threshold then
+    --     -- Smooth upward shift instead of instant jump
+    --     currentCameraY = currentCameraY - H * 0.5
+    -- end
 
     -- Apply camera transform
-    love.graphics.push()
-    love.graphics.translate(-currentCameraX, -currentCameraY)
+    -- love.graphics.push()
+    -- love.graphics.translate(-currentCameraX, -currentCameraY)
 
         -- EVERYTHING in world space
         CurrentArena:draw()
@@ -161,7 +161,7 @@ function DefaultStage:draw()
         -- Player2:draw()
         -- Ball:draw()
      
-    love.graphics.pop()
+    -- love.graphics.pop()
     Goals:draw()
     Arena:draw()
 

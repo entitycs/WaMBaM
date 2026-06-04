@@ -133,7 +133,7 @@ function MenuView:update(dt)
     end
 
     -- return false if game should be paused, true otherwise
-    return self.state.title == states.game.title
+    return self.state.title == states.game.title or self.state.title == states.tutorial.title
 end
 
 --------------------------------------------------------------------------------
