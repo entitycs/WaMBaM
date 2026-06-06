@@ -1,6 +1,6 @@
 local AudioProto = require("core.audio")
 local BodyBoostCooldown = require("core.abilities.cooldown")
-
+local context = require("core.context")
 local BodyBoost = {}
 BodyBoost.__index = BodyBoost
 
@@ -63,12 +63,12 @@ function BodyBoost:load(targetPlayer, forceTable)
             drainRate = 5.0,
             regenRate = 0.3,
             cooldownDelay = 1.0,
-            draw = function(window, value)
+            draw = function(awindow, value)
                 love.graphics.setColor(0.8, 0.3, 0.3)
                 love.graphics.rectangle(
                     "fill",
-                    window.bottom - 100,
-                    window.bottom - 50,
+                    awindow.bottom - 100,
+                    awindow.bottom - 50,
                     100 * value,
                     30
                 )
@@ -95,9 +95,9 @@ end
 --------------------------------------------------------------------------------
 --- draw
 --------------------------------------------------------------------------------
-function BodyBoost:draw(window)
-    self.window = window
-    self.cooldown:draw(window)
+function BodyBoost:draw( )
+ 
+    self.cooldown:draw(context.window)
 end
 
 -- something like a boost-empty audio would be nice
@@ -125,7 +125,7 @@ end
 
 function BodyBoost:clampTeleport(x, y)
     local minX, minY = 10, 10
-    local maxX, maxY = self.window.right - 10, self.window.bottom - 110
+    local maxX, maxY =  context.window.right - 10,  context.window.bottom - 110
 
     x = math.max(minX, math.min(x, maxX))
     y = math.max(minY, math.min(y, maxY))

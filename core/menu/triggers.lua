@@ -6,7 +6,7 @@ local Stage = require("current.stage")
 return function(states)
     -- Helper function to check input for a state
     local function checkConsumeInput(state)
-        return CheckConsumeInput(state)
+        return CheckConsumeInputAny(state)
     end
 
     return {

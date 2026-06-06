@@ -1,4 +1,0 @@
-local PlayerManager = {}
-
-
-return PlayerManager

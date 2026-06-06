@@ -157,13 +157,13 @@ function TutorialStage:draw()
 
         -- EVERYTHING in world space
         CurrentArena:draw()
-        -- Player1:draw()
+        Player1:draw()
         -- Player2:draw()
-        -- Ball:draw()
+        Ball:draw()
      
+        Arena:draw()
     love.graphics.pop()
     Goals:draw()
-    Arena:draw()
 
     -- UI only
     -- Menu:draw(self.window)

@@ -72,12 +72,12 @@ function MenuView:update(dt)
     if not machine then return end
     -- selection up/down (joystick only -- keyboard todo)
     for _, btn in pairs({ "dpdown", "dpright" }) do
-        if joystickInputProto.consumeButton(btn) then
+        if joystickInputProto.consumeButtonAny(btn) then
             machine:cursorNext()
         end
     end
     for _, btn in pairs({ "dpup", "dpleft" }) do -- ? can both be present in 1 update
-        if joystickInputProto.consumeButton(btn) then
+        if joystickInputProto.consumeButtonAny(btn) then
             machine:cursorPrev()
         end
     end
@@ -119,7 +119,7 @@ function MenuView:update(dt)
     -- check for selection trigger aligned with cursor
     if self.state ~= states.game and
         self.state ~= states.tutorial and
-        joystickInputProto.consumeButton("a") then
+        joystickInputProto.consumeButtonAny("a") then
         local currentSelection = machine:getSelectedNode()
         if currentSelection then
             self.state = currentSelection

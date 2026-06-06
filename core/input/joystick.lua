@@ -5,7 +5,7 @@ local activeInstances = {}
 -- local listeners = {}
 
 function love.joystickadded(js)
-    for _, inst in ipairs(activeInstances) do
+    for i, inst in ipairs(activeInstances) do
         if not inst.joystick then
             inst.joystick = js
             break
@@ -23,13 +23,22 @@ function love.gamepadpressed(js, button)
     end
 end
 
-function JoystickInput.consumeButton(button)
+function JoystickInput.consumeButtonAny(button)
     for _, inst in ipairs(activeInstances) do
         if inst.lastButton == button then
             inst.lastButton = "none"
             return true
         end
     end
+    return false
+end
+
+function JoystickInput:consumeButton(button)
+    if self.lastButton == button then
+        self.lastButton = "none"
+        return true
+    end
+
     return false
 end
 
@@ -49,7 +58,6 @@ function JoystickInput.new(listenerList) -- should i pass in a player
     table.insert(activeInstances, self)
     return self
 end
-
 
 --------------------------------------------------------------------------------
 --- load
@@ -81,6 +89,7 @@ end
 --- update
 --------------------------------------------------------------------------------
 function JoystickInput:update(dt)
+    print("joy")
     local limitedX = false
     local limitedY = false
     local listeners = self.listeners
@@ -103,7 +112,6 @@ function JoystickInput:update(dt)
 
     for _, l in ipairs(listeners) do
         if self.joystick:isGamepadDown("rightshoulder") then
-        
             l:onTrigger("rightshoulder", 1)
         else
             l:onTrigger("rightshoulder", 0)
@@ -117,7 +125,6 @@ function JoystickInput:update(dt)
     for _, l in ipairs(listeners) do
         l:onTrigger("triggerright", self.joystick:getGamepadAxis("triggerright"))
     end
-
 end
 
 --------------------------------------------------------------------------------

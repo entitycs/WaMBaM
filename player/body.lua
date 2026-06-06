@@ -7,6 +7,9 @@ local Abilities = require("player.abilities")
 local Collisions = require("player.collisions")
 local InputRouter = require("player.input_router")
 
+
+local window = require("core.window")
+local context = require("core.context")
 local playerCount = 1
 
 local Player = {}
@@ -19,6 +22,7 @@ local limitingVel = 400
 --------------------------------------------------------------------------------
 function Player.new()
     local self = setmetatable({
+        initialized = false,
         id = playerCount,
         joystickInput = nil,
         front = FrontProto.new(),
@@ -38,8 +42,8 @@ function Player.new()
         },
         collisionOnEnterRear = nil, -- built in :load (needs self.id)
         collisionOnEnterFront = nil,
-        window = {}, --suspect
-        motor = {}   -- testing
+        window = {},                --suspect
+        motor = {}                  -- testing
     }, Player)
     playerCount = playerCount + 1
     return self
@@ -67,11 +71,17 @@ end
 --------------------------------------------------------------------------------
 -- load
 --------------------------------------------------------------------------------
-function Player:load(window, world, wheelSize, contactHandler)
+function Player:load(config)
+    --
+    -- DO NOT RELOAD
+    --
+    -- if self.id <= playerCount + 1 then return end
     -- load body parts
+    print("loading player rear")
+
     self.window = window
-    self.rear:load(window, world, self.front, wheelSize, self.id)
-    self.front:load(window, world, self.rear, contactHandler, self.id)
+    self.rear:load(window, context.world, self.front, config.wheelSize, self.id)
+    self.front:load(window, context.world, self.rear, config.contactHandler, self.id)
     local center = {}
     center.joint = love.physics.newDistanceJoint(
         self.rear.body, self.front.body,
@@ -93,8 +103,9 @@ function Player:load(window, world, wheelSize, contactHandler)
     -- contact handlers (need self.id, so built here, not in :new)
     self.collisionOnEnterRear = Collisions.buildWheelHandler("Rear", self.id, self, "wam")
     self.collisionOnEnterFront = Collisions.buildWheelHandler("Front", self.id, self, "bam")
-    Collisions.load(self.audio, contactHandler, self.collisionOnEnterRear, self.collisionOnEnterFront)
+    Collisions.load(self.audio, config.contactHandler, self.collisionOnEnterRear, self.collisionOnEnterFront)
 
+    self.initialized = true
     -- inc for next player ID
     playerCount = playerCount + 1
 end
@@ -103,12 +114,14 @@ end
 -- update
 --------------------------------------------------------------------------------
 function Player:update(dt)
+    if not self.initialized then return end
+
     self.joystickInput:update(dt)
     self.abilities:update(dt)
     self.rear:update(dt)
     self.front:update(dt)
     KeyboardInput:update(dt)
-    
+
     self.rear.body:applyLinearImpulse(
         dt * self.currentState.forceValue.x,
         dt * self.currentState.forceValue.y
@@ -130,6 +143,7 @@ end
 -- draw
 --------------------------------------------------------------------------------
 function Player:draw()
+    if not self.initialized then return end
     -- Draw rear wheel
     self.rear:draw()
     -- Draw Front Wheel

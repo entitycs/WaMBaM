@@ -157,9 +157,9 @@ function DefaultStage:draw()
 
         -- EVERYTHING in world space
         CurrentArena:draw()
-        -- Player1:draw()
+        Player1:draw()
         -- Player2:draw()
-        -- Ball:draw()
+        Ball:draw()
      
     -- love.graphics.pop()
     Goals:draw()

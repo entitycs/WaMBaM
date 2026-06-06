@@ -47,7 +47,7 @@ function Forces.applyAcceleration(player, axisName, accelerationValue, limitingV
         xForce = totalForce
     elseif axisName == "lefty" and not limitedY then
         local totalForce = player.rear.force * accelerationValue
-        totalForce = totalForce * (1 + player.currentState.boostValue)
+        totalForce = totalForce * (2 + player.currentState.boostValue)
         yForce = totalForce
     end
     player.currentState.forceValue.x = xForce
@@ -56,7 +56,7 @@ function Forces.applyAcceleration(player, axisName, accelerationValue, limitingV
     limitedX, limitedY = Forces.checkLimits(player, "front", limitingVel * FRONT_VEL_MULTIPLIER)
     if axisName == "righty" and not limitedY then
         player.currentState.torqueValue.y = 1 + player.front.torque * accelerationValue
-        player.currentState.forceValue.y = player.currentState.forceValue.y - 0.95 * player.currentState.torqueValue.y
+        player.currentState.forceValue.y = player.currentState.forceValue.y - 0.75 * player.currentState.torqueValue.y
     elseif axisName == "rightx" and not limitedX then
         player.currentState.torqueValue.x = 1 + player.front.torque * accelerationValue
         player.currentState.forceValue.x = player.currentState.forceValue.x - 0.95 * player.currentState.torqueValue.x

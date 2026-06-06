@@ -1,3 +1,5 @@
+local context = require("core.context")
+
 local streakShader = require("agent.copilot.shaders.streakshader")
 local Rear = {}
 Rear.__index = Rear
@@ -10,7 +12,7 @@ local RotVis = require("agent.glm.rotvis")
 function Rear.new()
     local self = setmetatable({
         rotVis = nil,
-        streaks = {}
+        streaks = {},
     }, Rear)
 
     return self
@@ -33,21 +35,22 @@ end
 --------------------------------------------------------------------------------
 --- load
 --------------------------------------------------------------------------------
-function Rear:load(window, world, front, size, playerCount)
+function Rear:load(window, worlda, front, size, playerCount)
     self.x = 100
     self.y = 0
     self.size = size
-    self.body = love.physics.newBody(world, self.x, self.y, "dynamic")
+    self.body = love.physics.newBody(context.world, self.x, self.y, "dynamic")
+    print("rear body created")
     self.shape = love.physics.newCircleShape(self.size) -- copilot fix (wrong arguments prev.)
     self.fixture = love.physics.newFixture(self.body, self.shape, 1)
     self.fixture:setRestitution(0.01)
-    self.fixture:setFriction(2)
+    self.fixture:setFriction(100)
     self.fixture:setUserData({name = "Rear"..playerCount})
-    self.body:setMass(6)
-    self.body:setGravityScale(3)
+    self.body:setMass(18)
+    self.body:setGravityScale(1)
     self:releaseBraking()
     local dimmer = 1.0
-    self.force = self.body:getMass() * 220 * dimmer
+    self.force = self.body:getMass() * 200 * dimmer
     self.rotVis = RotVis.new(self.size, self.body, "RearRotation")
     self.front = front
     streakShader:load()
