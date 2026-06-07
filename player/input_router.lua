@@ -29,13 +29,7 @@ function InputRouter.onInput(player, name, value)
         end
         return
     end
-
-    -- Other triggers (boost, wamBoost) go straight to abilities.
-    if name == "triggerleft" or name == "rightshoulder" then
-        player.abilities:onInput(name, value)
-        -- return
-    end
-
+    
     -- Axes: cache joystick state for any future use, then apply.
     if name == "rightx" then player.joystickX = value end
     if name == "righty" then player.joystickY = value end
@@ -43,6 +37,12 @@ function InputRouter.onInput(player, name, value)
         Forces.applyAcceleration(player, name, value, player.limitingVel)
         return
     end
-end
 
+    -- Other triggers (boost, wamBoost) go straight to abilities.
+    -- if name == "triggerleft" or name == "rightshoulder" then
+        player.abilities:onInput(name, value)
+        -- return
+    -- end
+end
+    
 return InputRouter

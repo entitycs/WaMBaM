@@ -37,7 +37,9 @@ function CooldownHandler.new()
 end
 
 ------------------------------------------------
--- setCooldown
+--- setCooldown
+---@param name string identifier for the effect
+---@param def table non-general configuration
 ------------------------------------------------
 function CooldownHandler:setCooldown(name, def)
     -- shallow copy defaults
@@ -56,9 +58,11 @@ function CooldownHandler:setCooldown(name, def)
     -- io.write(string.format("check: %s \n", self.items["wam"].regenRate))
 end
 
----------------------------------------------------
--- onInput
----------------------------------------------------
+--------------------------------------------------
+--- onInput checks for non-zero, deadzone-surpassing input
+---@param itemName string item name
+---@param inputValue number input value
+--------------------------------------------------
 function CooldownHandler:onInput(itemName, inputValue)
     local item = self.items[itemName]
     if not item then return false end

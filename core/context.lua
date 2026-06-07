@@ -1,6 +1,7 @@
 local Context = {
     window = {},
     world = nil,
+
 }
 
 function Context.init()
@@ -12,6 +13,7 @@ function Context.init()
     Context.window.bottom = Context.window.height
 
     Context.world         = love.physics.newWorld(0, 90, true)
+
 end
 
 return Context

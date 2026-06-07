@@ -37,8 +37,7 @@ function Player.new()
             boostValue = 0,
             torqueValue = { x = 0, y = 0 },
             brakeReleasedThisFrame = false,
-            dtTriggers = {},
-            inputAngularVelocity = 0,
+            
         },
         collisionOnEnterRear = nil, -- built in :load (needs self.id)
         collisionOnEnterFront = nil,
@@ -50,8 +49,11 @@ function Player.new()
 end
 
 -- Called by the contact dispatcher via the handler factories in player/collisions.
-function Player:collisionOnEnter(fixture_a, fixture_b, contact)
-    love.audio.play(self.audio[fixture_a])
+function Player:collisionOnEnter(soundName, fixture_b, contact)
+    love.audio.play(self.audio[soundName])
+    -- track wam --> bam within dt
+    InputRouter.onInput(self, soundName, contact)
+    
 end
 
 -- Listener methods called by JoystickInput. All three delegate to the router.
@@ -65,7 +67,6 @@ end
 
 function Player:onTriggerRelease(triggerName)
     InputRouter.onInput(self, triggerName, 0)
-    self.dtTriggers[triggerName] = 0
 end
 
 --------------------------------------------------------------------------------
