@@ -39,8 +39,8 @@ function BodyBoost:load(targetPlayer, forceTable)
         "wam",
         {
             value = 1.0,      -- 1 = full, 0 = empty
-            drainRate = 0.5, -- per second
-            regenRate = 0.25,  -- per second
+            drainRate = 0.5,  -- per second
+            regenRate = 0.25, -- per second
             cooldownDelay = 5,
             draw = function(window, value)
                 -- print("made it")
@@ -86,7 +86,7 @@ function BodyBoost:update(dt)
     -- zero out 'summed' forces after applying
     self.cooldown:update(dt)
     print("current boost value: ", self.targetPlayer.currentState.boostValue, self.targetPlayer.id)
-    
+
 
     -- self.targetTable.x = 0
     -- self.targetTable.y = 0
@@ -95,15 +95,9 @@ end
 --------------------------------------------------------------------------------
 --- draw
 --------------------------------------------------------------------------------
-function BodyBoost:draw( )
- 
+function BodyBoost:draw()
     self.cooldown:draw(context.window)
 end
-
--- something like a boost-empty audio would be nice
--- function Player:collisionOnEnter(fixture_a, fixture_b, contact)
---     love.audio.play(self.audio[fixture_a])
--- end
 
 -- callbacks from InputHandler (ie. Joystick)
 function BodyBoost:onInput(triggerName, triggerValue)
@@ -125,7 +119,7 @@ end
 
 function BodyBoost:clampTeleport(x, y)
     local minX, minY = 10, 10
-    local maxX, maxY =  context.window.right - 10,  context.window.bottom - 110
+    local maxX, maxY = context.window.right - 10, context.window.bottom - 110
 
     x = math.max(minX, math.min(x, maxX))
     y = math.max(minY, math.min(y, maxY))

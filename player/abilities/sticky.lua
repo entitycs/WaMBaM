@@ -45,13 +45,13 @@ function BodySticky:load(targetPlayer, stateTable)
             drainRate = 0.5,  -- per second
             regenRate = 0.25, -- per second
             cooldownDelay = 5,
-            draw = function(window, value)
+            draw = function(awindow, value)
                 -- print("made it")
                 love.graphics.setColor(0.7, 0.1, 0.7)
                 love.graphics.rectangle(
                     "fill",
-                    window.bottom - 300,
-                    window.bottom - 50,
+                    awindow.bottom - 300,
+                    awindow.bottom - 50,
                     100 * value,
                     30
                 )
@@ -77,7 +77,10 @@ function BodySticky:update(dt)
     local impulseStrength = 0.05
     self.ballBody:applyLinearImpulse(dx * impulseStrength, dy * impulseStrength - 2)
     if math.abs(dx) > 50 or math.abs(dy) > 50 then
+        self.cooldown:onInput("sticky", 0)
         self.ballBody = nil; self.wamBody = nil
+    else
+        self.cooldown:onInput("sticky", 1) -- if...
     end
 end
 

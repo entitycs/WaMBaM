@@ -55,6 +55,7 @@ end
 --------------------------------------------------------------------------------
 function Abilities:draw(window)
     self.boost:draw()
+    self.sticky:draw()
 end
 
 return Abilities
