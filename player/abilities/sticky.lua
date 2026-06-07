@@ -1,7 +1,6 @@
 local AudioProto = require("core.audio")
 local BodyStickyCooldownProto = require("core.abilities.cooldown")
 local context = require("core.context")
-local ball = require("core.ball")
 
 local BodySticky = {
     wamBody = nil,
@@ -27,9 +26,6 @@ function BodySticky.new(targetBody, forceTable)
         audio = AudioProto.new(),
         wamBody = nil,
         ballBody = nil,
-        -- currentState = {
-        --     boostValue = 0
-        -- },
     }, BodySticky)
 
     return self
@@ -72,23 +68,17 @@ end
 function BodySticky:update(dt)
     -- zero out 'summed' forces after applying
     self.cooldown:update(dt)
-    print("current sticky value: ", self.targetPlayer.currentState.sticky, self.targetPlayer.id)
-    
+
     if not self.wamBody or not self.ballBody then
-        print("nope..........", self.wamBody, self.ballBody)
         return
     end
     local x, y = self.wamBody:getX(), self.wamBody:getY()
     local dx, dy = x - self.ballBody:getX(), y - self.ballBody:getY()
-    print("yep!!!!!!!!!!!!!!!!!!!!!!!!!!", dx, dy)
     local impulseStrength = 0.05
     self.ballBody:applyLinearImpulse(dx * impulseStrength, dy * impulseStrength - 2)
-    if dx > 50 or dy > 50 then
+    if math.abs(dx) > 50 or math.abs(dy) > 50 then
         self.ballBody = nil; self.wamBody = nil
     end
-    -- todo - find 'magic number', or implement such that cooldown consumed by dx, dy
-    -- self.targetTable.x = 0
-    -- self.targetTable.y = 0
 end
 
 --------------------------------------------------------------------------------
@@ -112,26 +102,15 @@ function BodySticky:onInput(triggerName, triggerValue)
         elseif bName == "Ball" then
             self:applySticky(a:getBody(), b:getBody())
         end
-        print(",,,BodySticky - ", aName, bName)
-
     end
-    print("BodySticky - ", triggerName, triggerValue)
 end
 
 function BodySticky:applySticky(player, aball)
-    -- self.targetPlayer.currentState.boostValue = 3
     self.wamBody = player
     self.ballBody = aball
-
-    -- current behavior: single frame of impulse results in elastic bounceaway
 end
 
 function BodySticky:applyStickyBall(aball, boostValue)
-    -- find vector representing wam-facing direction (front to rear ->)
-    -- local x, y = self.targetPlayer.rear.body:getX(), self.targetPlayer.rear.body:getY()
-
-
-    -- self.currentState.forceValue = diffVector
 end
 
 return BodySticky

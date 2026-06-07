@@ -80,11 +80,11 @@ function Forces.applyBraking(player, brakeValue)
         -- average out front and back velocities over the frame following braking
         player.front:releaseBraking()
         player.rear:releaseBraking()
-        local newx, newy = player.rear.body:getLinearVelocity()
-        local newx2, newy2 = player.front.body:getLinearVelocity()
-        local resx, resy = 0.5 * (newx + newx2), 0.5 * (newy + newy2)
-        player.rear.body:setLinearVelocity(resx * heldDt, resy * heldDt)
-        player.front.body:setLinearVelocity(resx * heldDt, resy * heldDt)
+        -- local newx, newy = player.rear.body:getLinearVelocity()
+        -- local newx2, newy2 = player.front.body:getLinearVelocity()
+        -- local resx, resy = 0.5 * (newx + newx2), 0.5 * (newy + newy2)
+        -- player.rear.body:setLinearVelocity(resx * heldDt, resy * heldDt)
+        -- player.front.body:setLinearVelocity(resx * heldDt, resy * heldDt)
         player.currentState.brakeReleasedThisFrame = false
     end
 end

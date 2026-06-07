@@ -46,7 +46,7 @@ function Rear:load(window, worlda, front, size, playerCount)
     self.fixture:setRestitution(0.01)
     self.fixture:setFriction(100)
     self.fixture:setUserData({name = "Rear"..playerCount})
-    self.body:setMass(28)
+    self.body:setMass(38)
     self.body:setGravityScale(1)
     self:releaseBraking()
     local dimmer = 1.0
