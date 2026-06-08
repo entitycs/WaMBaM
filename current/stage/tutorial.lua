@@ -1,13 +1,9 @@
 require("core.ratios")
 require("current.arena")
 require("core.utils.table")
--- local Menu = require("core.menu.controller")
 local Arena = require("core.tutorial_arena")
-local Goals = require("current.goals.container")
 local Ball = require("core.ball")
-local PlayerProto = require("player.body")
 local Player1 = {}
-local Player2 = {}
 
 local ContactHandler = require("core.contact")
 
@@ -15,7 +11,6 @@ local TutorialStage = {
     window = {},
     world = {}
 }
-
  
 local influence = 0.9
 local smoothFactor = 0.01
@@ -41,11 +36,6 @@ local reloadBall = {
     end
 }
  
-
-local center = {} -- connector
- 
-
-
 --------------------------------------------------------------------------------
 --- load
 --------------------------------------------------------------------------------
@@ -58,71 +48,35 @@ function TutorialStage:load(window, world, players, contactHandler)
     self.window.right = 1200
     self.window.bottom = 600
 
-    -- -- Set the window size
-    -- love.window.setMode(self.window.right, self.window.bottom)
-
-    -- Create new World
-    -- world = love.physics.newWorld(0, 90, true)
-    -- Menu:load(self.window, self.world)
-    -- Set contact handling callback
-
     -- Add to contact handling callback list, post-set!
     contactHandler:addBegin(reloadBall)
 
-    local wheelSize = 10
-
-    -- -- Ball
-    local ballRadius = BallSize(wheelSize)
-    -- Ball:load(self.window, self.world, ballRadius)
-
-    -- -- Players
+     -- -- Players
     Player1 = players[1]--PlayerProto.new()
-    Player2 = players[2]--PlayerProto.new()
 
-    -- Player2:load(window, world, wheelSize, contactHandler)
-    -- Player1:load(window, world, wheelSize, contactHandler)
     -- Arena
     Arena:load(window, world)
-
-    -- Per 'Round/Game' Arena
-    CurrentArena:load(window, world, ballRadius)
-    Goals:load(window, world, ballRadius * 2)
 
     Directions = { "up", "down", "left", "right" }
     DirectionTargets = { "y", "y", "x", "x" }
 end
 
 function TutorialStage:unload()
-    Goals:unload()
     Arena:unload()
     ContactHandler:removeBegin(reloadBall)
 end
+
 --------------------------------------------------------------------------------
 --- update
 --------------------------------------------------------------------------------
 function TutorialStage:update(dt)
     
-    -- local isResume = Menu:update(dt)
-    
-    -- if not isResume then return end
-    
     -- update world
     self.world:update(dt)
-
-    -- update ball
-    -- Ball:update(dt)
-
-    -- Player1:update(dt)
-    -- Player2:update(dt)
 end
-
-local function createWorld()
-
-end
-
 
 --------------------------------------------------------------------------------
---- draw
+--- draw - *w/ help from copilot
 --------------------------------------------------------------------------------
 function TutorialStage:draw()
     love.graphics.clear(0.1, 0.1, 0.12)
@@ -153,20 +107,11 @@ function TutorialStage:draw()
 
     -- Apply camera transform
     love.graphics.push()
-    love.graphics.translate(-currentCameraX, -currentCameraY)
-
-        -- EVERYTHING in world space
-        CurrentArena:draw()
+        love.graphics.translate(-currentCameraX, -currentCameraY)
         Player1:draw()
-        -- Player2:draw()
         Ball:draw()
-     
         Arena:draw()
     love.graphics.pop()
-    Goals:draw()
-
-    -- UI only
-    -- Menu:draw(self.window)
 end
 
 return TutorialStage

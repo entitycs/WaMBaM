@@ -4,12 +4,13 @@ local TutorialArena = {
     floor = {},
     left = {},
     top = {},
-    right = {}
+    right = {},
+    textbox = {}
 }
 
 local function dashedLine(x1, y1, x2, y2, dash, gap)
     local dx, dy = x2 - x1, y2 - y1
-    local len = math.sqrt(dx*dx + dy*dy)
+    local len = math.sqrt(dx * dx + dy * dy)
     local nx, ny = dx / len, dy / len
 
     local t = 0
@@ -22,36 +23,6 @@ local function dashedLine(x1, y1, x2, y2, dash, gap)
         t = t + dash + gap
     end
 end
-function TutorialArena:draw()
-    love.graphics.print(self.floor.shape:getPoints(), 50, 100) -- Print text on the screen
-    -- Draw floor edge
-    love.graphics.setColor(0.8, 0.8, 0.8)
-    love.graphics.setLineWidth(4)
-    love.graphics.line(self.floor.shape:getPoints())
-    love.graphics.setColor(1, 0, 0)
-
-    for _, e in ipairs(self.edges) do
-        local x1, y1, x2, y2 = e.body:getWorldPoints(e.shape:getPoints())
-
-        -- Glow pass
-        love.graphics.setBlendMode("add")
-        love.graphics.setColor(1, 1, 1, 1)
-        love.graphics.setLineWidth(10)
-        love.graphics.line(x1, y1, x2, y2)
-        -- Shadow pass (offset + darker + thicker)
-        love.graphics.setBlendMode("multiply", "premultiplied")
-        love.graphics.setColor(1,1,1, .1)
-        love.graphics.setLineWidth(18)
-        love.graphics.line(x1 + 3, y1 + 3, x2 + 3, y2 + 3)
-        -- Core line
-        love.graphics.setBlendMode("alpha")
-        love.graphics.setColor(.1, .1, .1)
-        love.graphics.setLineWidth(4)
-        dashedLine(x1, y1, x2, y2, 10, 6)
-
-        -- love.graphics.line(e.body:getWorldPoints(e.shape:getPoints()))
-    end
-end
 
 function TutorialArena:randomEdges(window, world, opt)
     local edges = {}
@@ -61,11 +32,11 @@ function TutorialArena:randomEdges(window, world, opt)
     for i = 1, count do
         -- Random position on LEFT side only
         local x = math.random(opt.paddingX, midX - opt.paddingX)
-        local y = - opt.beginY + math.random(opt.paddingY, window.bottom - opt.paddingY)
+        local y = -opt.beginY + math.random(opt.paddingY, window.bottom - opt.paddingY)
 
         -- Random length and angle
         local length = math.random(opt.minLength, opt.maxLength)
-        local angle = math.random() *  math.pi / 4
+        local angle = math.random() * math.pi / 4
 
 
         -- Compute endpoints
@@ -86,16 +57,16 @@ function TutorialArena:randomEdges(window, world, opt)
             angle = angle,
             length = length
         })
---  1780111767.8787
+        --  1780111767.8787
         -- MIRRORED X POSITION
         local mirroredX  = midX + (midX - x)
 
         -- To mirror across vertical axis:
         -- flip the X offsets (dx -> -dx), keep dy the same
-        local mdx = -dx
-        local mdy = dy
+        local mdx        = -dx
+        local mdy        = dy
 
-        local rightBody = love.physics.newBody(world, mirroredX, y, "static")
+        local rightBody  = love.physics.newBody(world, mirroredX, y, "static")
         local rightShape = love.physics.newEdgeShape(-mdx, -mdy, mdx, mdy)
         local f          = love.physics.newFixture(rightBody, rightShape)
         f:setFriction(200.0)
@@ -114,7 +85,14 @@ function TutorialArena:randomEdges(window, world, opt)
     return edges
 end
 
+--------------------------------------------------------------------------------
+--- load
+--------------------------------------------------------------------------------
 function TutorialArena:load(window, world)
+    self.textbox = {
+        oFont = love.graphics.getFont(),
+        font = love.graphics.newFont("fonts/VampiroOne-Regular.ttf", 40)
+    }
     local seed = os.time() + love.timer.getTime()
     print("RANDOM SEED: ", seed)
     math.randomseed(os.time() + love.timer.getTime())
@@ -143,13 +121,10 @@ function TutorialArena:load(window, world)
     self.top.fixture:setSensor(true)
     self.top.fixture:setFriction(20)
     self.edges = {}
-    -- temp Text:set(
 
-    -- local edges = self:randomEdges(window, world,
-    --     { paddingX = 20, paddingY = 50, count = 4, minLength = 10, maxLength = 100 })
     for i = 0, 20 do
-        local y = -i * 350 -- each level 800px higher
-        local edges = 
+        local y = -i * 350 -- each level 350px higher
+        local edges =
             self:randomEdges(window, world,
                 { beginY = -y, paddingX = 20, paddingY = 20, count = 3, minLength = 30, maxLength = 150 })
         for j = 1, #edges do
@@ -165,6 +140,46 @@ function TutorialArena:unload()
         local edge = self.edges[i]
         edge.body:destroy()
         table.remove(self.edges, i)
+    end
+end
+
+--------------------------------------------------------------------------------
+--- draw
+--------------------------------------------------------------------------------
+function TutorialArena:draw()
+    -- Setting the font so that it is used when drawning the string.
+    love.graphics.setFont(self.textbox.font)
+
+    -- Draws "Hello world!" at position x: 100, y: 200 with the custom font applied.
+    love.graphics.print("Hello world!", 100, 200)
+    love.graphics.setFont(self.textbox.oFont)
+    love.graphics.print(self.floor.shape:getPoints(), 50, 100) -- Print text on the screen
+    -- Draw floor edge
+    love.graphics.setColor(0.8, 0.8, 0.8)
+    love.graphics.setLineWidth(4)
+    love.graphics.line(self.floor.shape:getPoints())
+    love.graphics.setColor(1, 0, 0)
+
+    for _, e in ipairs(self.edges) do
+        local x1, y1, x2, y2 = e.body:getWorldPoints(e.shape:getPoints())
+
+        -- Glow pass
+        love.graphics.setBlendMode("add")
+        love.graphics.setColor(1, 1, 1, 1)
+        love.graphics.setLineWidth(10)
+        love.graphics.line(x1, y1, x2, y2)
+        -- Shadow pass (offset + darker + thicker)
+        love.graphics.setBlendMode("multiply", "premultiplied")
+        love.graphics.setColor(1, 1, 1, .1)
+        love.graphics.setLineWidth(18)
+        love.graphics.line(x1 + 3, y1 + 3, x2 + 3, y2 + 3)
+        -- Core line
+        love.graphics.setBlendMode("alpha")
+        love.graphics.setColor(.1, .1, .1)
+        love.graphics.setLineWidth(4)
+        dashedLine(x1, y1, x2, y2, 10, 6)
+
+        -- love.graphics.line(e.body:getWorldPoints(e.shape:getPoints()))
     end
 end
 
