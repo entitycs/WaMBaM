@@ -107,7 +107,7 @@ function DefaultStage:update(dt)
     -- if not isResume then return end
     
     -- update world
-    self.world:update(dt)
+    -- self.world:update(dt)
 
     -- update ball
     -- Ball:update(dt)
