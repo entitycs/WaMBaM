@@ -85,7 +85,7 @@ end
 function BodyBoost:update(dt)
     -- zero out 'summed' forces after applying
     self.cooldown:update(dt)
-    print("current boost value: ", self.targetPlayer.currentState.boostValue, self.targetPlayer.id)
+    -- print("current boost value: ", self.targetPlayer.currentState.boostValue, self.targetPlayer.id)
 
 
     -- self.targetTable.x = 0
@@ -107,7 +107,7 @@ function BodyBoost:onInput(triggerName, triggerValue)
         end
     elseif triggerName == inputMap.boost then
         if self.cooldown:onInput("wam", triggerValue) then
-            print("(applyBoost) boosting 1")
+            -- print("(applyBoost) boosting 1")
             self:applyBoost(triggerName, 4 * triggerValue)
         end
     end

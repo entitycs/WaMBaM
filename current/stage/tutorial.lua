@@ -9,16 +9,17 @@ local ContactHandler = require("core.contact")
 
 local TutorialStage = {
     window = {},
-    world = {}
+    world = {},
+    textbox = {},
 }
- 
+
 local influence = 0.9
 local smoothFactor = 0.01
 local currentCameraX = 0
 local currentCameraY = 0
 
 local reloadBall = {
-    test =  function (aName, bName)
+    test = function(aName, bName)
         local names = { aName, bName }
         if not Pop(names, "Ball") then
             return false
@@ -27,15 +28,15 @@ local reloadBall = {
         if not collider then return false end
         -- note: NOT regex
         return string.match(collider, "^Goal%d*$") ~= nil
-    end ,
+    end,
     invoke = function(fixtureA, fixtureB, contact)
         Ball:drop(nil, 30)
         love.audio.play(love.audio.newSource("audio/score.wav", "static"))
-        currentCameraX = 0--Ball.body:getX()
-        currentCameraY = 0--Ball.body:getY()
+        currentCameraX = 0 --Ball.body:getX()
+        currentCameraY = 0 --Ball.body:getY()
     end
 }
- 
+
 --------------------------------------------------------------------------------
 --- load
 --------------------------------------------------------------------------------
@@ -48,11 +49,17 @@ function TutorialStage:load(window, world, players, contactHandler)
     self.window.right = 1200
     self.window.bottom = 600
 
+    self.textbox = {
+        positions = { { x = 0, y = 0 } },
+        oFont = love.graphics.getFont(),
+        font = love.graphics.newFont("fonts/VampiroOne-Regular.ttf", 40)
+    }
+
     -- Add to contact handling callback list, post-set!
     contactHandler:addBegin(reloadBall)
 
-     -- -- Players
-    Player1 = players[1]--PlayerProto.new()
+    -- -- Players
+    Player1 = players[1] --PlayerProto.new()
 
     -- Arena
     Arena:load(window, world)
@@ -70,9 +77,10 @@ end
 --- update
 --------------------------------------------------------------------------------
 function TutorialStage:update(dt)
-    
     -- update world
     self.world:update(dt)
+    print(Ball.body:getY())
+    if Ball.body:getY() > 0 then Ball:drop(nil, 30) end
 end
 
 --------------------------------------------------------------------------------
@@ -90,7 +98,7 @@ function TutorialStage:draw()
 
     -- Camera target: player slightly below center (Only Up style)
     local targetCameraX = px - W * 0.5
-    local targetCameraY = py - H * 0.6   -- <--- THIS is the magic ratio
+    local targetCameraY = py - H * 0.6 -- <--- THIS is the magic ratio
 
     -- Smooth follow
     currentCameraX = currentCameraX + (targetCameraX - currentCameraX) * smoothFactor * 0.1
@@ -107,11 +115,17 @@ function TutorialStage:draw()
 
     -- Apply camera transform
     love.graphics.push()
-        love.graphics.translate(-currentCameraX, -currentCameraY)
-        Player1:draw()
-        Ball:draw()
-        Arena:draw()
+    love.graphics.translate(-currentCameraX, -currentCameraY)
+    Player1:draw()
+    Ball:draw()
+    Arena:draw()
     love.graphics.pop()
+    love.graphics.setFont(self.textbox.font)
+
+    -- Draws "Hello world!" at position x: 100, y: 200 with the custom font applied.
+    love.graphics.setColor(1,1,1,.5)
+    love.graphics.print("Hello world!", 100, 200)
+    love.graphics.setFont(self.textbox.oFont)
 end
 
 return TutorialStage

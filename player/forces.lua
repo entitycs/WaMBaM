@@ -34,7 +34,7 @@ end
 -- torqueX from forceValue.x) with the same 0.95 magic number.
 --------------------------------------------------------------------------------
 function Forces.applyAcceleration(player, axisName, accelerationValue, limitingVel)
-    print("current boost value 0: ", player.currentState.boostValue, player.id)
+    -- print("current boost value 0: ", player.currentState.boostValue, player.id)
     limitingVel = limitingVel or DEFAULT_LIMITING_VEL
     local limitedX, limitedY = Forces.checkLimits(player, "rear", limitingVel)
     local xForce = player.currentState.forceValue.x

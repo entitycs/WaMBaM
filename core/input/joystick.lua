@@ -89,7 +89,7 @@ end
 --- update
 --------------------------------------------------------------------------------
 function JoystickInput:update(dt)
-    print("joy")
+    -- print("joy")
     local limitedX = false
     local limitedY = false
     local listeners = self.listeners

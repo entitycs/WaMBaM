@@ -85,6 +85,8 @@ function love.update(dt)
     -- update world
     world:update(dt)
 
+    Stage.arena:update(dt)
+    
     -- update ball
     Ball:update(dt)
     PlayerManager.update(dt)

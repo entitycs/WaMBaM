@@ -5,7 +5,7 @@ local TutorialArena = {
     left = {},
     top = {},
     right = {},
-    textbox = {}
+    -- textbox = {}
 }
 
 local function dashedLine(x1, y1, x2, y2, dash, gap)
@@ -24,6 +24,7 @@ local function dashedLine(x1, y1, x2, y2, dash, gap)
     end
 end
 
+-- * w/ help from copilot
 function TutorialArena:randomEdges(window, world, opt)
     local edges = {}
     local count = 6
@@ -89,10 +90,11 @@ end
 --- load
 --------------------------------------------------------------------------------
 function TutorialArena:load(window, world)
-    self.textbox = {
-        oFont = love.graphics.getFont(),
-        font = love.graphics.newFont("fonts/VampiroOne-Regular.ttf", 40)
-    }
+    -- self.textbox = {
+    --     positions = {{x = 0, y = 0}},
+    --     oFont = love.graphics.getFont(),
+    --     font = love.graphics.newFont("fonts/VampiroOne-Regular.ttf", 40)
+    -- }
     local seed = os.time() + love.timer.getTime()
     print("RANDOM SEED: ", seed)
     math.randomseed(os.time() + love.timer.getTime())
@@ -126,10 +128,11 @@ function TutorialArena:load(window, world)
         local y = -i * 350 -- each level 350px higher
         local edges =
             self:randomEdges(window, world,
-                { beginY = -y, paddingX = 20, paddingY = 20, count = 3, minLength = 30, maxLength = 150 })
+                { beginY = -y, paddingX = 20, paddingY = 80, count = 3, minLength = 30, maxLength = 150 })
         for j = 1, #edges do
             local edge = edges[j]
             table.insert(self.edges, edge)
+            -- table.insert(self.textbox.positions, {x = 100, y = y})
         end
     end
     -- self.edges = edges
@@ -148,11 +151,11 @@ end
 --------------------------------------------------------------------------------
 function TutorialArena:draw()
     -- Setting the font so that it is used when drawning the string.
-    love.graphics.setFont(self.textbox.font)
+    -- love.graphics.setFont(self.textbox.font)
 
-    -- Draws "Hello world!" at position x: 100, y: 200 with the custom font applied.
-    love.graphics.print("Hello world!", 100, 200)
-    love.graphics.setFont(self.textbox.oFont)
+    -- -- Draws "Hello world!" at position x: 100, y: 200 with the custom font applied.
+    -- love.graphics.print("Hello world!", 100, 200)
+    -- love.graphics.setFont(self.textbox.oFont)
     love.graphics.print(self.floor.shape:getPoints(), 50, 100) -- Print text on the screen
     -- Draw floor edge
     love.graphics.setColor(0.8, 0.8, 0.8)
@@ -160,7 +163,7 @@ function TutorialArena:draw()
     love.graphics.line(self.floor.shape:getPoints())
     love.graphics.setColor(1, 0, 0)
 
-    for _, e in ipairs(self.edges) do
+    for i, e in ipairs(self.edges) do
         local x1, y1, x2, y2 = e.body:getWorldPoints(e.shape:getPoints())
 
         -- Glow pass
