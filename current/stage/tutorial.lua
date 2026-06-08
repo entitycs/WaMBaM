@@ -79,8 +79,8 @@ end
 function TutorialStage:update(dt)
     -- update world
     self.world:update(dt)
-    print(Ball.body:getY())
-    if Ball.body:getY() > 0 then Ball:drop(nil, 30) end
+    -- print(Ball.body:getY())
+    if Ball.body:getY() > self.window.bottom then Ball:drop(nil, 30) end
 end
 
 --------------------------------------------------------------------------------
