@@ -9,7 +9,7 @@
 local Forces = {}
 
 local DEFAULT_LIMITING_VEL = 400
-local FRONT_VEL_MULTIPLIER = 2.15  -- magic number preserved
+local FRONT_VEL_MULTIPLIER = 557.15  -- magic number preserved
 
 --------------------------------------------------------------------------------
 -- Velocity limit check. Returns (limitedX, limitedY) for the given body part.

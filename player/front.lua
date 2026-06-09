@@ -32,8 +32,8 @@ function Front:applyBraking(inputValue)
     if self.brakingDt == -1 then
         self.brakingDt = 0
     end
-    self.body:setLinearDamping(25 * inputValue + 0.5)
-    self.body:setAngularDamping(25 * inputValue + 0.5)
+    self.body:setLinearDamping(35 * inputValue + 0.5)
+    -- self.body:setAngularDamping(25 * inputValue + 0.5)
 end
 
 function Front:releaseBraking()

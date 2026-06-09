@@ -3,7 +3,7 @@ StateMachine.__index = StateMachine
 
 --------------------------------------------------------------------------------
 --- new
--------------------------------------------------------------------------------- 
+--------------------------------------------------------------------------------
 function StateMachine.new()
     local self = setmetatable({
         state = nil,
@@ -38,12 +38,11 @@ end
 function StateMachine:cursorReset()
     self.cursor = 1
     if nil == self.state or nil == self.state.nodes then return end
-    for k,v in pairs(self.state.nodes) do
+    for k, v in pairs(self.state.nodes) do
         v.selected = false
     end
     self.state.nodes[1].selected = true
 end
-
 
 function StateMachine:onTest()
     -- print("StateMachine:onTest 1", self.state.trigger.onTest)
@@ -61,9 +60,10 @@ function StateMachine:onTest()
     end
     return 0, self.state
 end
+
 --------------------------------------------------------------------------------
 --- load (& reload)
--------------------------------------------------------------------------------- 
+--------------------------------------------------------------------------------
 function StateMachine:load(newState)
     self.state = newState
     self:cursorReset()

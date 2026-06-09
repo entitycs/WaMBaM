@@ -46,11 +46,11 @@ function Rear:load(window, worlda, front, size, playerCount)
     self.fixture:setRestitution(0.01)
     self.fixture:setFriction(100)
     self.fixture:setUserData({name = "Rear"..playerCount})
-    self.body:setMass(38)
+    self.body:setMass(10)
     self.body:setGravityScale(1)
     self:releaseBraking()
     local dimmer = 1.0
-    self.force = self.body:getMass() * 150 * dimmer
+    self.force = self.body:getMass() * 100 * dimmer
     self.rotVis = RotVis.new(self.size, self.body, "RearRotation")
     self.front = front
     streakShader:load()
